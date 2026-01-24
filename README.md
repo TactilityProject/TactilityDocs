@@ -1,4 +1,4 @@
-This projects contains the documentation website [docs.tactility.one](https://docs.tactility.one).
+This projects contains the documentation website [docs.tactility.one](https://docs.tactilityproject.org).
 
 It is built with [Docsify](https://docsify.js.org), which installs as follows:
 
