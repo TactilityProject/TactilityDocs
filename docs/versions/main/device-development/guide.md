@@ -55,20 +55,19 @@ Keep in mind that other devices might have the same or similar hardware, so you 
 
 Make sure there's a `extern const tt::hal::Configuration hardwareConfiguration = { .. }` variable declared. It needs to be declared exactly like this. Place it in a file named `Configuration.cpp`
 
-Re-use existing drivers from:
+You'll also need a `devicetree.yaml` file and a `.dts` file.
 
-- Tactility at `Drivers/`
-- [components.espressif.com](https://components.espressif.com/) and write your own wrappers. Look at Tactility's `Drivers/` for examples.
+When possible, re-use existing drivers:
 
-Alternatively, you can implement your own or refactor another open source driver.
+- Legacy drivers, using a C++ interface based on `tt::hal::Device`, found in `Drivers/`
+- New kernel drivers based on the `TactilityKernel` subproject. The drivers are found in `Platforms/` and `Drivers/`
+- [components.espressif.com](https://components.espressif.com/) and write your own wrappers.
 
-If you find `esp_lcd` or `esp_lcd_touch` drivers, you can implement them more easily with `Drivers/EspLcdCompat/` functionality:
+New drivers should be written as kernel drivers. Look at `Platforms/PlatformEsp32` for examples.
 
-- `class EspLcdTouch` will assist with a touch driver implementation
-- `class EspLcdSpiDisplay` is the recommended base class for SPI display drivers
-- `class EspLcdDisplayV2` is the recommended base class for non-SPI display drivers
-- `class EspLcdDisplay` can be used in more complex driver scenarios
+Explore the [drivers documentation](device-development/drivers.md) or the [legacy drivers documentation](device-development/drivers-legacy.md) for more details.
 
 ## Continuous Integration
 
 Update the device matrix in `.github/workflows/build-firmware.yml`
+
