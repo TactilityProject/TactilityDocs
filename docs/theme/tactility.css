@@ -1,7 +1,7 @@
 /*!
  * Tactility theme, based on Darcula > Darkly > Dark theme for docsify
  */
-@import url('https://fonts.googleapis.com/css?family=Roboto+Mono|Source+Sans+Pro:300,600');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro:300,600');
 * {
   -webkit-font-smoothing: antialiased;
   -webkit-overflow-scrolling: touch;
@@ -10,21 +10,21 @@
   -webkit-touch-callout: none;
   box-sizing: border-box;
 }
-  :root {
-    --docsifytabs-border-color:#303d4a;
-    --docsifytabs-border-px:1px;
-    --docsifytabs-border-radius-px: ;
-    --docsifytabs-margin:1.5em 0;
-    --docsifytabs-tab-background:#303d4a;
-    --docsifytabs-tab-background--active:var(--docsifytabs-content-background);
-    --docsifytabs-tab-color:#999;
-    --docsifytabs-tab-color--active:#ee81c3;
-    --docsifytabs-tab-highlight-px:3px;
-    --docsifytabs-tab-highlight-color:var(--theme-color,currentColor);
-    --docsifytabs-tab-padding:0.6em 1em;
-    --docsifytabs-content-background:inherit;
-    --docsifytabs-content-padding:1.5rem
-  }
+:root {
+  --docsifytabs-border-color:#303d4a;
+  --docsifytabs-border-px:1px;
+  --docsifytabs-border-radius-px: ;
+  --docsifytabs-margin:1.5em 0;
+  --docsifytabs-tab-background:#303d4a;
+  --docsifytabs-tab-background--active:var(--docsifytabs-content-background);
+  --docsifytabs-tab-color:#999;
+  --docsifytabs-tab-color--active:#ee81c3;
+  --docsifytabs-tab-highlight-px:3px;
+  --docsifytabs-tab-highlight-color:var(--theme-color,currentColor);
+  --docsifytabs-tab-padding:0.6em 1em;
+  --docsifytabs-content-background:inherit;
+  --docsifytabs-content-padding:1.5rem
+}
 body:not(.ready) {
   overflow: hidden;
 }
@@ -98,7 +98,7 @@ body {
   -webkit-font-smoothing: antialiased;
   /* color: #34495e; */
   color: #bbc0c4;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: "Open Sans", "Courier New", monospace;
   font-size: 16px;
   letter-spacing: 0;
   margin: 0;
@@ -740,7 +740,8 @@ body {
 .markdown-section code,
 .markdown-section pre {
   background-color: #1e1e25;
-  font-family: Roboto Mono, Monaco, courier, monospace;
+  font-family: Source Sans Pro, courier, monospace;
+  font-size: 16px;
 }
 .markdown-section pre {
   -moz-osx-font-smoothing: initial;
