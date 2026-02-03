@@ -36,3 +36,6 @@ If a property value is a boolean, then it must be the string literal `true` or `
 - `colorDepth`: required integer value representing the amount of bits per pixel (e.g. `16`)
 - `theme`: optional text value representing the theme name (e.g. `Mono`, `DefaultDark`, `DefaultLight`)
 
+## [sdkconfig]
+
+Any property that is put here is copied directly into the `sdkconfig` file by `device.py`.

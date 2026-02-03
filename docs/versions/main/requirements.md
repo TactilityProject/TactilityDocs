@@ -16,3 +16,11 @@ The list of supported devices is available on the [main website](https://tactili
 
 A Wi-Fi connection is not required, but it will greatly improve the development experience as it allows you to install and run apps directly from a PC.
 
+## IDE
+
+An IDE is optional. You can build everything with CMake via the commandline.
+
+Here are some good IDE options:
+- [CLion](https://www.jetbrains.com/clion/) (paid)
+- [VSCode](https://code.visualstudio.com/) (free)
+

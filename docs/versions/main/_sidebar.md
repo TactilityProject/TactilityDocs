@@ -2,11 +2,10 @@
   - [Configuration](configuration.md)
 - Start Developing
   - [Requirements](requirements.md)
-  - [Installation](installation.md)
 - App Development
   - [Fundamentals](app-development/fundamentals.md)
-  - [Symbols](app-development/symbols.md)
   - [Getting Started](app-development/getting-started.md)
+  - [Symbols](app-development/symbols.md)
 - Device Development
   - [Hardware Considerations](device-development/hardware-considerations.md)
   - [Guide](device-development/guide.md)
@@ -17,7 +16,6 @@
   - [HAL fundamentals](os-development/hal-fundamentals.md)
   - [Project Structure](os-development/project-structure.md)
   - [Building Tactility](os-development/building-tactility.md)
-  - [Build Scripts](os-development/build-scripts.md)
   - [Simulator](os-development/simulator.md)
 - Other
   - [Licenses & Copyrights](../licenses-and-copyrights.md)

@@ -1,21 +1,42 @@
-# App Development - Symbols
+# Symbols
 
 The list of available function is limited. This page explains how to add new ones and how to test them.
 
-## Exposing a libc or LVGL symbol
+## Core symbols
 
-1. Add the symbol to `tt_init.cpp`.
+Symbols relating to libc, string and other basic functionality are registered in the `TactilityC` subproject:
+
+1. Add the new symbol to `tt_init.cpp`.
 2. Build a new device firmware and flash it.
 
 Note: You don't need to publish and use a new `TactilitySDK`, as the libc function is available via an existing header file that is available to any external app project.
 
-## Exposing a new Tactility symbol
+## Kernel module symbols
 
-1. Expose the symbol in `TactilityC` via a `.c` and `.h` file: this will wrap the C++ function into a C function and make it available to the apps.
-2. Add the new `TactilityC` symbol to `tt_init.cpp`.
-3. Build a new device firmware and flash it.
-4. Build `TactilitySDK`
-5. Build your external app with the new SDK.
+Some functionality is part of a kernel module, such as `lvgl-module` in the `Modules` directory.
+
+A kernel module can optionally specify a list of symbols. For example:
+```c
+const struct ModuleSymbol lvgl_module_symbols[] = {
+    DEFINE_MODULE_SYMBOL(lv_event_get_code),
+    DEFINE_MODULE_SYMBOL(lv_event_get_indev),
+    DEFINE_MODULE_SYMBOL(lv_event_get_key),
+    DEFINE_MODULE_SYMBOL(lv_event_get_param),
+    /* ... */
+    MODULE_SYMBOL_TERMINATOR
+};
+
+struct Module lvgl_module = {
+    .name = "lvgl",
+    .start = start,
+    .stop = stop,
+    .symbols = (const struct ModuleSymbol*)lvgl_module_symbols
+};
+```
+
+## Exposing a symbol for new functionality
+
+New Tactility symbols should be part of a kernel module in the `Modules/` folder.
 
 ## Building TactilitySDK locally
 
@@ -27,3 +48,4 @@ When making changes to `TactilityC`, you'll need to build your own SDK locally:
 4. Run `Buildscripts/release-sdk-current.sh`
 5. Set environment variable `TACTILITY_SDK_PATH` - for example: `export TACTILITY_SDK_PATH=/path/to/Tactility/release/TactilitySDK`
 6. Run `tactility.py build esp32s3 --local-sdk` (change "esp32s3" to the relevant hardware target where applicable)
+
