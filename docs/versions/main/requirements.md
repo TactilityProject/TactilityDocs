@@ -12,7 +12,7 @@
 
 There are no specific hardware requirements for the development PC.
 
-The list of supported devices is available on the [main website](https://tactility.one/#/supported-devices). You can implement your own ESP32 and ESP32S3 devices as you wish. Other Espressif SOCs might also compile, but official support for these is planned for the future.
+The list of supported devices is available on the [main website](https://tactilityproject.org/#/supported-devices). You can implement your own ESP32 and ESP32S3 devices as you wish. Other Espressif SOCs might also compile, but official support for these is planned for the future.
 
 A Wi-Fi connection is not required, but it will greatly improve the development experience as it allows you to install and run apps directly from a PC.
 

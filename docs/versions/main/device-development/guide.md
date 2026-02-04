@@ -23,19 +23,6 @@ Examples:
 - `unPhone` -> `unphone`
 - `Elecrow CrowPanel Basic 2.8"` -> `elecrow-crowpanel-basic-28`
 
-## Update Kconfig
-
-Define the new device in `Firmware/Kconfig`.
-
-You'll need a new configuration entry that matches a preprocessor definition with a device name. Like this:
-
-```kconfig
-config TT_DEVICE_LILYGO_TDECK
-    bool "LilyGo T-Deck"
-```
-
-The `TT_` prefix is required. Use the device identifier as a basis for the name. Make it all upper-case and replace hyphens with underscores.
-
 ## Create project folder
 
 Make an empty new folder in `Devices/` with a name that matches the device identifier exactly (case-sensitive).

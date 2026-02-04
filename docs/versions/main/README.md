@@ -1,6 +1,6 @@
 ## Overview
 
-This is the documentation for [Tactility](https://tactility.one) development.
+This is the documentation for [Tactility](https://tactilityproject.org) development.
 
 Tactility is an operating system for devices with a SOC from the ESP32 family.
 
