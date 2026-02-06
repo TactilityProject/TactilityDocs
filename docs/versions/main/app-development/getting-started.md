@@ -54,6 +54,16 @@ python tactility.py brrr 192.168.1.123
 
 ## Debugging
 
+### Serial monitor
+
+You can connect your device via USB and use `idf.py monitor` to check the logs for debug or crash details.
+
+To use `idf.py` you must have the [main firmware repository](https://github.com/TactilityProject/Tactility) checked out and run it from there.
+
+To connect faster, run `idf.py -p [PORT] monitor`
+
+### Attaching a debugger
+
 This hasn't been investigated yet, but the [approach from Zephyr](https://docs.zephyrproject.org/latest/services/llext/debug.html) might work.
 In the case of Tactility, the mentioned breakpoint could be placed at `esp_elf_relocate()`
 
