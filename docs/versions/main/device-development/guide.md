@@ -44,6 +44,11 @@ Make sure there's a `extern const tt::hal::Configuration hardwareConfiguration =
 
 You'll also need a `devicetree.yaml` file and a `.dts` file.
 
+Create a `Source/module.cpp` or an equivalent `.c` file.
+This file must contain a `struct Module device_module = { ... }` with that exact name.
+If you have custom drivers based on `TactilityKernel`, they are registered via this module.
+Drivers based on the older `tt::hal::Device` are registered via `Configuration.cpp`
+
 When possible, re-use existing drivers:
 
 - Legacy drivers, using a C++ interface based on `tt::hal::Device`, found in `Drivers/`
