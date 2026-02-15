@@ -37,6 +37,7 @@ If a property value is a boolean, then it must be the string literal `true` or `
 - `theme`: optional text value representing the theme name (e.g. `Mono`, `DefaultDark`, `DefaultLight`)
 - `fontSize`: optional size value (defaults to `14`)
 - `dpi`: optional override for `[display]`'s `dpi` setting. This changes the way LVGL scales its widgets.
+- `uiDensity`: optional, decides how closely the widgets are put together. Set to `default` or `compact`. Defaults to `default`.
 
 ## [cdn]
 - `warningMessage`: optional, adds warning message to CDN (App Hub) metadata
