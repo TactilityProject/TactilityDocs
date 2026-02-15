@@ -35,6 +35,12 @@ If a property value is a boolean, then it must be the string literal `true` or `
 
 - `colorDepth`: required integer value representing the amount of bits per pixel (e.g. `16`)
 - `theme`: optional text value representing the theme name (e.g. `Mono`, `DefaultDark`, `DefaultLight`)
+- `fontSize`: optional size value (defaults to `14`)
+- `dpi`: optional override for `[display]`'s `dpi` setting. This changes the way LVGL scales its widgets.
+
+## [cdn]
+- `warningMessage`: optional, adds warning message to CDN (App Hub) metadata
+- `infoMessage`: optional, adds info message to CDN (App Hub) metadata
 
 ## [sdkconfig]
 
