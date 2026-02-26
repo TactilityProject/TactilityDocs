@@ -18,6 +18,13 @@ python tactility.py build
 python tactility.py build esp32s3
 ```
 
+If you have more than one app in your repository, you can specify its path:
+
+```bash
+python tactility.py Apps/SomeApp build
+python tactility.py Apps/OtherApp build
+```
+
 Documentation for this command can be found [here](https://github.com/ByteWelder/TactilityTool).
 
 ## Installing and running   

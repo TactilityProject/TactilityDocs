@@ -11,11 +11,9 @@ Symbols relating to libc, string and other basic functionality are registered in
 
 Note: You don't need to publish and use a new `TactilitySDK`, as the libc function is available via an existing header file that is available to any external app project.
 
-## Kernel module symbols
+## Module symbols
 
-Some functionality is part of a kernel module, such as `lvgl-module` in the `Modules` directory.
-
-A kernel module can optionally specify a list of symbols. For example:
+Some functionality is part of a (kernel) module, such as `lvgl-module`:
 ```c
 const struct ModuleSymbol lvgl_module_symbols[] = {
     DEFINE_MODULE_SYMBOL(lv_event_get_code),
@@ -26,21 +24,33 @@ const struct ModuleSymbol lvgl_module_symbols[] = {
     MODULE_SYMBOL_TERMINATOR
 };
 
+static error_t start() { /* Initialize LVGL memory and task(s) */ }
+
+static error_t stop() { /* Stop LVGL tasks and free up memory */ }
+
 struct Module lvgl_module = {
     .name = "lvgl",
     .start = start,
     .stop = stop,
-    .symbols = (const struct ModuleSymbol*)lvgl_module_symbols
+    .symbols = (const struct ModuleSymbol*)lvgl_module_symbols,
+    .internal = NULL
 };
 ```
 
+Modules are found in these locations:
+
+- `Drivers/`: Older style drivers and newer module-based ones
+- `Modules/`: Contains functionality modules
+- `Platforms/`: Platform modules (e.g. ESP32 or POSIX) 
+- `TactilityKernel/`: The core kernel/system.
+
 ## Exposing a symbol for new functionality
 
-New Tactility symbols should be part of a kernel module in the `Modules/` folder.
+New Tactility symbols should be part of a kernel module whenever possible. Legacy symbol types can remain part of `TactilityC` for now.
 
 ## Building TactilitySDK locally
 
-When making changes to `TactilityC`, you'll need to build your own SDK locally:
+When you export new symbols, you'll need to build your own SDK locally:
 
 1. Open a terminal and navigate to the Tactility project root folder.
 2. Build the firmware for the relevant target (e.g. ESP32 S3) with `idf.py build`

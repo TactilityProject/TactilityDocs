@@ -13,7 +13,6 @@
   - [Drivers (Legacy)](device-development/drivers-legacy.md)
   - [Device Properties](device-development/device-properties.md)
 - OS Development
-  - [HAL fundamentals](os-development/hal-fundamentals.md)
   - [Project Structure](os-development/project-structure.md)
   - [Building Tactility](os-development/building-tactility.md)
   - [Simulator](os-development/simulator.md)

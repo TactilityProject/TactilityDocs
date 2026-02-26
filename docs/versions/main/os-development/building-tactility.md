@@ -12,10 +12,12 @@ git clone --recurse-submodules -j8 https://github.com/ByteWelder/Tactility.git
 
 ## Building on Linux/macOS/WSL2
 
-Make a copy of `sdkconfig.board.YOUR_BOARD` and name it `sdkconfig`. Copy from `sdkconfig.defaults` if you are setting up a custom board.
+Select a device by its identifier. The identifier is the name of the subdirectory of `Devices/`.
+
+Use `python device.py <device-id>` to select the device. For example:
 
 ```sh
-cp sdkconfig.board.<board-name> sdkconfig
+python device.py m5stack-core2
 ```
 
 Build the firmware:

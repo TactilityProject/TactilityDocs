@@ -3,7 +3,8 @@
 ## Boot
 
 During the boot process, the system tries to load the `boot.properties` file from an SD card (if present and mounted).
-When it fails to load from SD card, it's loaded from `/data/settings`.
+When it fails to load from SD card, it tries to load it from `/data/settings`.
+When that fails to load too, the system defaults are used.
 
 Locations:
 - `/data/settings/boot.properties`

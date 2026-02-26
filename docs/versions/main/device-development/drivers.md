@@ -13,7 +13,7 @@ struct Driver {
     const void* api;
     const struct DeviceType* device_type;
     const struct Module* owner;
-    struct DriverPrivate* driver_private;
+    struct DriverInternal* internal;
 };
 ```
 
@@ -28,7 +28,7 @@ Driver esp32_i2c_driver = {
     .api = (void*)&esp32_i2c_api,
     .device_type = &I2C_CONTROLLER_TYPE,
     .owner = &platform_module,
-    .driver_private = nullptr
+    .internal = NULL
 };
 ```
 
@@ -69,7 +69,7 @@ struct Device {
     const char* name;
     const void* config;
     struct Device* parent;
-    struct { /* ... */ } internal;
+    struct DeviceInternal* internal;
 }
 ```
 
@@ -83,6 +83,7 @@ static struct Device i2c_internal = {
 	.name = "i2c_internal",
 	.config = &i2c_internal_config,
 	.parent = &root,
+	.internal = NULL
 };
 ```
 
@@ -133,7 +134,8 @@ struct Module {
     const char* name;
     error_t (*start)(void);
     error_t (*stop)(void);
-    struct { /* ... */ } internal;
+    const struct ModuleSymbol* symbols;
+    struct ModuleInternal* internal;
 };
 ```
 
@@ -148,33 +150,46 @@ For example:
 struct Module platform_module = {
     .name = "platform-esp32",
     .start = start, // register ESP32 drivers
-    .stop = stop // deregister ESP32 drivers
+    .stop = stop, // deregister ESP32 drivers
+    .symbols = NULL,
+    .internal = NULL
 };
 ```
 
-A module is tracked by a `ModuleParent`:
+The lifecycle is as follows:
 
-```c
-struct ModuleParent {
-    const char* name;
-    struct ModuleParentPrivate* module_parent_private;
-};
+```plantuml
+@startuml
+[*] --> module_construct : module is created (internal fields initialized)
+module_construct --> module_add : module is added and becomes discoverable
+module_add --> module_start : module is started and becomes usable
+module_start --> module_stop : module is stopped and is not usable anymore
+module_stop --> module_remove : module is removed and stops being discoverable
+module_remove --> module_destruct : module memory is cleaned up
+module_destruct --> [*]
+skinparam ranksep 25
+skinparam padding 2
+@enduml
 ```
 
 Example:
 
 ```c
-// Construct parent
-check(module_parent_construct(&parent) == ERROR_NONE);
-
-// Set parent and start module
-check(module_set_parent(&hal_device_module, &parent) == ERROR_NONE);
+// Allocate memory (creates internal data)
+check(module_construct(&hal_device_module) == ERROR_NONE);
+// Register the module
+check(module_add(&hal_device_module) == ERROR_NONE);
+// Activate the module
 check(module_start(&hal_device_module) == ERROR_NONE);
 
 // The module is now active
 
 // Stop the module
 check(module_stop(&hal_device_module) == ERROR_NONE);
+// Deregister the module
+check(module_remove(&hal_device_module) == ERROR_NONE);
+// Deallocate memory (destroys internal data)
+check(module_destruct(&hal_device_module) == ERROR_NONE);
 ```
 
 ## Devicetree
@@ -199,8 +214,8 @@ The devicetree defines a set of `struct Device` instances based on a `.dts` file
 		compatible = "espressif,esp32-i2c";
 		port = <I2C_NUM_0>;
 		clock-frequency = <100000>;
-		pin-sda = <3>;
-		pin-scl = <2>;
+		pin-sda = <&gpio0 3 GPIO_FLAG_NONE>; // Pin 3
+		pin-scl = <&gpio0 2 GPIO_FLAG_NONE>; // Pin 2
 	};
 };
 ```
