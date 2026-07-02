@@ -11,4 +11,3 @@ Develop with:
 ```sh
 docsify serve docs
 ```
-
