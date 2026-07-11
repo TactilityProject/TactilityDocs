@@ -61,11 +61,9 @@ You can also double-check `settings.json`. It should refer to the ESP-IDF instal
 
 - Click "File > Save Workspace as..." as save the `Tactiliy.code-workspace` to the Tactility folder.
 - Click the "ESP-IDF: Explorer" extension on the left side panel, click "Open ESP-IDF Terminal".
-- Run `.\Buildscripts\build.ps1 <board name> eg: cyd-2432S024c`
-Or manually: 
-```powershell
-cp sdkconfig.board.<boardname> (insert board name) sdkconfig
-idf.py build
+- Use `python device.py <device-id>` to select the device. For example:
+```sh
+python device.py m5stack-core2
 ```
 
 Run `.\Buildscripts\release.ps1 <board name>`

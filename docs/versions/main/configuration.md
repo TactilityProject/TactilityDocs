@@ -1,14 +1,18 @@
 # Configuration
 
+User data files are stored on either `/sdcard/tactility/` or `/data/tactility/`.
+
+The `/data` partition is only present on devices that don't have an SD card slot. Devices with an SD card slot must have an SD card present when booting. 
+
 ## Boot
 
 During the boot process, the system tries to load the `boot.properties` file from an SD card (if present and mounted).
-When it fails to load from SD card, it tries to load it from `/data/settings`.
+When it fails to load from SD card, it tries to load it from `/{user_data}/settings`.
 When that fails to load too, the system defaults are used.
 
 Locations:
-- `/data/settings/boot.properties`
-- (optional) `/sdcard/settings/boot.properties`
+- `/{user_data}/settings/boot.properties`
+- (optional) `/{user_data}/settings/boot.properties`
 
 Properties:
 - `launcherAppId`: The application identifier for the launcher app. This parameter is required. The default is "Launcher".
@@ -16,9 +20,9 @@ Properties:
 
 ## System
 
-General system settings are stored in `system.properties` which is loaded from `/data/settings`
+General system settings are stored in `system.properties` which is loaded from `/{user_data}/settings`
 
-Location: `/data/settings/system.properties`
+Location: `/{user_data}/settings/system.properties`
 
 Properties:
 - `language`: The locale that determines the language. The default is "en-US". Supported languages: en-US, en-GB, nl-NL, nl-BE, fr-FR
@@ -28,7 +32,7 @@ Properties:
 
 ## Wi-Fi Access Point Provisioning
 
-Access point provisioning files can be placed in `/data/settings` and/or `/sdcard/settings`
+Access point provisioning files can be placed in `/{user_data}/provisioning`.
 
 For each access point that you want to configure, create a unique file in the root of the SD card with the name `[name].ap.properties` where `[name]` can be any text you like.
 
@@ -50,7 +54,7 @@ Properties:
 
 ## Wi-Fi Settings
 
-These settings are found in `/data/settings/wifi.properties`
+These settings are found in `/{user_data}/settings/wifi.properties`
 
 Properties:
 

@@ -10,7 +10,6 @@
   - [Hardware Considerations](device-development/hardware-considerations.md)
   - [Guide](device-development/guide.md)
   - [Drivers](device-development/drivers.md)
-  - [Drivers (Legacy)](device-development/drivers-legacy.md)
   - [Device Properties](device-development/device-properties.md)
 - OS Development
   - [Project Structure](os-development/project-structure.md)

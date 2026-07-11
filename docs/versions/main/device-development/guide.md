@@ -37,27 +37,17 @@ See the [device.properties documentation](device-development/device-properties.m
 
 ## Implementation
 
-Look at other device projects to see how they are set up. The LilyGO T-Deck is one of the better reference implementations.
-Keep in mind that other devices might have the same or similar hardware, so you can possibly copy parts of their implementations. (e.g. the display and/or touch driver)
-
-Make sure there's a `extern const tt::hal::Configuration hardwareConfiguration = { .. }` variable declared. It needs to be declared exactly like this. Place it in a file named `Configuration.cpp`
+Use `Devices/lilygo-tdeck/` as a reference.
 
 You'll also need a `devicetree.yaml` file and a `.dts` file.
 
 Create a `Source/module.cpp` or an equivalent `.c` file.
-This file must contain a `struct Module device_module = { ... }` with that exact name.
-If you have custom drivers based on `TactilityKernel`, they are registered via this module.
-Drivers based on the older `tt::hal::Device` are registered via `Configuration.cpp`
+This file must contain a `struct Module your_device_identifier_module = { ... }` 
+The top of the file should declare `extern const tt::hal::Configuration hardwareConfiguration = { };` to facilitate the old driver subsystems. It should remain an empty configuration.
 
-When possible, re-use existing drivers:
+Drivers based on the `TactilityKernel` subproject. The drivers are found in `Platforms/` and `Drivers/`.
 
-- Legacy drivers, using a C++ interface based on `tt::hal::Device`, found in `Drivers/`
-- New kernel drivers based on the `TactilityKernel` subproject. The drivers are found in `Platforms/` and `Drivers/`
-- [components.espressif.com](https://components.espressif.com/) and write your own wrappers.
-
-New drivers should be written as kernel drivers. Look at `Platforms/PlatformEsp32` for examples.
-
-Explore the [drivers documentation](device-development/drivers.md) or the [legacy drivers documentation](device-development/drivers-legacy.md) for more details.
+Explore the [drivers documentation](device-development/drivers.md).
 
 ## Continuous Integration
 
