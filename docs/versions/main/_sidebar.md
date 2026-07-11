@@ -11,10 +11,13 @@
   - [Guide](device-development/guide.md)
   - [Drivers](device-development/drivers.md)
   - [Device Properties](device-development/device-properties.md)
+  - [Wiring Conventions](device-development/wiring.md)
 - OS Development
+  - [Architecture](os-development/architecture.md)
   - [Project Structure](os-development/project-structure.md)
   - [Building Tactility](os-development/building-tactility.md)
   - [Simulator](os-development/simulator.md)
+  - [Testing](os-development/testing.md)
 - Other
   - [Licenses & Copyrights](../licenses-and-copyrights.md)
   - [Support](../support.md)

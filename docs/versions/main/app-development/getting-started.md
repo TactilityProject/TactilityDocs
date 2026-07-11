@@ -2,9 +2,9 @@
 
 ## Examples
 
-You can find examples in the [TactilityApps](https://github.com/ByteWelder/TactilityApps) project.
+You can find examples in the [TactilityApps](https://github.com/TactilityProject/TactilityApps) project.
 
-Each app in the [Apps/](https://github.com/ByteWelder/TactilityApps/tree/main/Apps) directory is its own standalone project.
+Each app in the [Apps/](https://github.com/TactilityProject/TactilityApps/tree/main/Apps) directory is its own standalone project.
 
 ## Building
 
@@ -25,7 +25,7 @@ python tactility.py Apps/SomeApp build
 python tactility.py Apps/OtherApp build
 ```
 
-Documentation for this command can be found [here](https://github.com/ByteWelder/TactilityTool).
+Documentation for this command can be found [here](https://github.com/TactilityProject/TactilityTool).
 
 ## Installing and running   
 

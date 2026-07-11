@@ -66,6 +66,7 @@ There can also more abstract instances of devices that help facilitate other dev
 ```c
 /** Represents a piece of hardware */
 struct Device {
+    int32_t address;
     const char* name;
     const void* config;
     struct Device* parent;
@@ -74,7 +75,7 @@ struct Device {
 ```
 
 A device has a name for debugging/logging purposes.
-It has an optional `config`.
+It has an optional `config`, and an `address` that can represent an index, a memory address, or some other kind of offset.
 
 For example:
 

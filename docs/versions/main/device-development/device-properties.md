@@ -16,7 +16,7 @@ If a property value is a boolean, then it must be the string literal `true` or `
 
 ## hardware
 
-- `hardware.target`: required text value representing hardware target. Currently supporting `ESP32` and `ESP32S3`.
+- `hardware.target`: required text value representing hardware target. Currently supporting `ESP32`, `ESP32S3`, `ESP32C6` and `ESP32P4`.
 - `hardware.flashSize`: required text value representing flash ROM size (e.g. `16MB`)
 - `hardware.spiRam`: required text value representing SPIRAM availability setting (boolean)
 - `hardware.spiRamMode`: required text value representing SPIRAM mode (e.g. `OCT`, `QUAD`)
@@ -24,8 +24,10 @@ If a property value is a boolean, then it must be the string literal `true` or `
 - `hardware.tinyUsb`: optional boolean representing tinyUSB feature setting boolean (only works on ESP32 S2, S3, P4 and H4)
 - `hardware.esptoolFlashFreq`: optional text value representing flash frequency for esptool (e.g. `120M`) - this fixes some compile errors on devices
 - `hardware.fixRgbDisplayGlitch`: optional boolean to enable a performance boost by setting `CONFIG_ESP32S3_DATA_CACHE_LINE_64B=y`
+- `hardware.bluetooth`: optional boolean to enable Bluetooth (NimBLE) support (`CONFIG_BT_ENABLED`, `CONFIG_BT_NIMBLE_ENABLED`)
+- `hardware.usbHostEnabled`: optional boolean to enable USB host support (hubs, mass storage, etc.)
 
-## hardware
+## storage
 
 - `storage.userDataLocation`: set to either "SD" or "Internal"
 

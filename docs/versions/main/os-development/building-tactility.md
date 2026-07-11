@@ -7,7 +7,7 @@ Make sure you looked at the [requirements](requirements.md) first.
 Ensure you clone the repository including the submodules! For example:
 
 ```sh
-git clone --recurse-submodules -j8 https://github.com/ByteWelder/Tactility.git
+git clone --recurse-submodules -j8 https://github.com/TactilityProject/Tactility.git
 ```
 
 ## Building on Linux/macOS/WSL2

@@ -19,7 +19,7 @@ Naming specifications:
 
 Examples:
 
-- `M5Stack StickC Plus` -> `m5stack-stickc-plus`
+- `LilyGO T-Deck Plus` -> `lilygo-tdeck-plus`
 - `unPhone` -> `unphone`
 - `Elecrow CrowPanel Basic 2.8"` -> `elecrow-crowpanel-basic-28`
 
@@ -48,8 +48,4 @@ The top of the file should declare `extern const tt::hal::Configuration hardware
 Drivers based on the `TactilityKernel` subproject. The drivers are found in `Platforms/` and `Drivers/`.
 
 Explore the [drivers documentation](device-development/drivers.md).
-
-## Continuous Integration
-
-Update the device matrix in `.github/workflows/build-firmware.yml`
 

@@ -49,7 +49,7 @@ If you notice that X11 or Wayland options are not on when compiling SDL, try ins
 Clone the repository:
 
 ```sh
-git clone https://github.com/ByteWelder/Tactility.git --recurse-submodules
+git clone https://github.com/TactilityProject/Tactility.git --recurse-submodules
 ```
 
 From the project folder, run:

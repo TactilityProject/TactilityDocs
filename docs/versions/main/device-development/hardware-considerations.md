@@ -2,8 +2,9 @@
 
 ## SOC
 
-The ESP32 and ESP32-S3 are actively tested. The S3 will perform much better and is the preferred target.
-Other SOCs will likely also be supported in the future, but we currently don't have device implementations for them.
+ESP32, ESP32-S3 and ESP32-P4 are the most actively tested targets. The S3 will perform much better and is the preferred target.
+ESP32-C6 is also supported , but is less widely tested than the S3.
+Other Espressif SOCs might also compile, but aren't officially supported yet.
 
 ## Memory
 
