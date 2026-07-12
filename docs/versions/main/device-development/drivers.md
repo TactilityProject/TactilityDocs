@@ -125,6 +125,33 @@ check(device_remove(&i2c_internal) == ERROR_NONE);
 check(device_denstruct(&i2c_internal) == ERROR_NONE);
 ```
 
+### Referencing a device safely
+
+Looking up a device only returns a pointer - nothing stops another thread from calling `device_stop()` on it right after, freeing the driver's private data before you get a chance to use it.
+
+For any lookup that isn't immediately followed by a single, same-thread use, take a reference instead of a bare pointer:
+
+```c
+Device* device;
+if (device_get_by_name("i2c_internal", &device) == ERROR_NONE) {
+    // device is guaranteed valid and started until device_put()
+    some_api_call(device);
+    device_put(device);
+}
+```
+
+`device_get_by_name()` (and `device_get_first_by_type()`, `device_get_first_active_by_type()`, `device_get_first_by_compatible()`) look up and reference a device atomically, so a device that's concurrently torn down is either not found or safely referenced - never a dangling pointer. While any reference is outstanding, `device_stop()` fails fast with `ERROR_RESOURCE_BUSY` instead of tearing down the driver's data underneath you.
+
+If you already hold a trusted `Device*` (e.g. a static devicetree pointer captured once at bind time) and just need to bracket a single operation, use the lower-level pair directly:
+
+```c
+if (device_get(device) == ERROR_NONE) {
+    some_api_call(device);
+    device_put(device);
+}
+```
+
+The older `device_find_*()` functions (`device_find_by_name()`, `device_find_first_by_type()`, `device_find_first_active_by_type()`, `device_find_first_by_compatible()`) are deprecated in favor of the `device_get_*()` family above - they still work for a same-thread, no-yield-in-between lookup-and-use, but don't protect against the teardown race.
 
 ## Module
 
