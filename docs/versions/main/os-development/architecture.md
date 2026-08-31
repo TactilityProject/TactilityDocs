@@ -2,13 +2,9 @@
 
 ## Layer Stack
 
-From bottom to top:
-
-- **TactilityKernel** — C API kernel: device/driver/module lifecycle, concurrency primitives (thread, mutex, timer, dispatcher), filesystem, logging. Header convention: `<tactility/*.h>` (lowercase snake_case). See [Drivers](device-development/drivers.md) for the device/driver/module system.
-- **TactilityFreeRtos** — Thin C++ wrappers around FreeRTOS primitives.
-- **Tactility** — Main OS layer: app framework, service framework, HAL (deprecated, being replaced by TactilityKernel), LVGL integration, networking and services (Wi-Fi, BLE, NTP, ESP-NOW), settings, i18n.
-- **TactilityC** — C bindings (`tt_*.h`) for Tactility, used by side-loaded ELF apps on ESP32. Deprecated, being replaced by TactilityKernel. See [Symbols](app-development/symbols.md).
-- **Firmware** — Entry point (`app_main`), links everything together for a specific device.
+- **Tactility**: The main project which is used to build the firmware and simulator builds. It ties everything together with wrappers and some basic applications.
+- **TactilityKernel**: The kernel with C API: device/driver/module lifecycle, concurrency primitives (thread, mutex, timer, dispatcher), filesystem, logging. Header convention: `<tactility/*.h>` (lowercase snake_case). See [Drivers](device-development/drivers.md) for the device/driver/module system.
+- **TactilityFreeRtos**: Thin C++ wrappers around FreeRTOS primitives.
 
 ## App Framework
 
@@ -18,15 +14,12 @@ Apps implement `tt::app::App` (or provide plain callbacks). Each app has an `App
 
 Services implement `tt::service::Service` with a `ServiceManifest`. Services are long-running background processes: GUI, Wi-Fi, the app loader, the statusbar, GPS, the [WebServer](../features/webserver.md), and more.
 
-## HAL Layer
+## Hardware Abstraction Layer
 
-### Deprecated HAL
+The main driver abstractions are in TactilityKernel. Implementations of drivers are found in `Drivers/`.
+Secondary driver modules are located at `Modules/`.
 
-Located in the `Tactility` folder. `tt::hal::Configuration` is declared per-device board (in `Devices/<id>/Source/Configuration.cpp`). It provides `initBoot` for early hardware setup and `createDevices` to instantiate HAL device wrappers (display, touch, power, keyboard, etc.). Devices that have been migrated to the current HAL still declare an empty placeholder configuration for compatibility.
-
-### Current HAL
-
-Located in TactilityKernel, based on the Linux driver subsystem model described in [Drivers](device-development/drivers.md): modules register drivers, drivers bind to devices via `compatible` strings from the devicetree.
+Drivers are based on the Linux driver subsystem model described in [Drivers](device-development/drivers.md): modules register drivers, drivers bind to devices via `compatible` strings from the devicetree.
 
 ## Platform Abstraction
 
@@ -45,15 +38,4 @@ User interfaces should scale well for everything between very large (e.g. 1280x7
 
 ## Coding Style
 
-Two conventions coexist; which one to use depends on the project layer:
-
-- **C code** (TactilityKernel, drivers): `lower_snake_case` for files, functions, variables. `UpperCamelCase` for types. Files live in `source/`, `include/`, `private/` directories.
-- **C++ code** (Tactility, apps, services): `UpperCamelCase` for files and types. `lowerCamelCase` for functions. Files live in `Source/`, `Include/`, `Private/` directories.
-
-Formatting is enforced by `.clang-format` (LLVM-based, 4-space indent, no column limit).
-
-Other conventions:
-- Never throw exceptions — use return types for error handling.
-- Use `enum class` over plain `enum`.
-- Don't do null checks: the caller is responsible for passing valid data. Pointers are expected to be non-null unless documented otherwise.
-- `#ifdef ESP_PLATFORM` guards ESP32-specific code; the simulator uses POSIX equivalents.
+Detailed coding style can be found in the project's `CODING_STYLE_C.md` and `CODING_STYLE_CPP.md` files.

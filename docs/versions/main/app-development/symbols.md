@@ -13,7 +13,7 @@ Note: You don't need to publish and use a new `TactilitySDK`, as the libc functi
 
 ## Module symbols
 
-Some functionality is part of a (kernel) module, such as `lvgl-module`:
+Some functionality is part of a (kernel) module, such as `lvgl-module` or `http-module`:
 ```c
 const struct ModuleSymbol lvgl_module_symbols[] = {
     DEFINE_MODULE_SYMBOL(lv_event_get_code),

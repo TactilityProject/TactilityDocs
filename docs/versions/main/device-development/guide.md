@@ -43,7 +43,6 @@ You'll also need a `devicetree.yaml` file and a `.dts` file.
 
 Create a `Source/module.cpp` or an equivalent `.c` file.
 This file must contain a `struct Module your_device_identifier_module = { ... }` 
-The top of the file should declare `extern const tt::hal::Configuration hardwareConfiguration = { };` to facilitate the old driver subsystems. It should remain an empty configuration.
 
 Drivers based on the `TactilityKernel` subproject. The drivers are found in `Platforms/` and `Drivers/`.
 

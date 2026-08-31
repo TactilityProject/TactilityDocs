@@ -70,12 +70,15 @@ struct Device {
     const char* name;
     const void* config;
     struct Device* parent;
+    device_flags_t flags;
     struct DeviceInternal* internal;
 }
 ```
 
 A device has a name for debugging/logging purposes.
 It has an optional `config`, and an `address` that can represent an index, a memory address, or some other kind of offset.
+
+`flags` is a bitmask of `DEVICE_FLAG_*` (`tactility/device.h`): `DEVICE_FLAG_DTS` (instantiated from a `.dts` file), `DEVICE_FLAG_DYNAMIC` (dynamically allocated), `DEVICE_FLAG_VIRTUAL` (no physical hardware), `DEVICE_FLAG_REMOVABLE` (may disappear, e.g. USB/SDIO), `DEVICE_FLAG_HOTPLUG` (supports hotplug).
 
 For example:
 
@@ -151,7 +154,16 @@ if (device_get(device) == ERROR_NONE) {
 }
 ```
 
-The older `device_find_*()` functions (`device_find_by_name()`, `device_find_first_by_type()`, `device_find_first_active_by_type()`, `device_find_first_by_compatible()`) are deprecated in favor of the `device_get_*()` family above - they still work for a same-thread, no-yield-in-between lookup-and-use, but don't protect against the teardown race.
+### SPI bus locking
+
+A driver whose device sits on a shared SPI controller (parent device type `SPI_CONTROLLER_TYPE`) must bracket its own bus access with `spi_controller_lock()`/`spi_controller_unlock()` - or `spi_controller_lock_bus_of()`/`spi_controller_unlock_bus_of()` for the common case of a direct child - at the logical-operation level, not per primitive. This isn't done for you by the generic device-type wrappers (`display.h`, `pointer.h`, etc.); only the driver knows which of its own calls actually touch the bus.
+
+```c
+if (spi_controller_lock_bus_of(device) == ERROR_NONE) {
+    // one logical operation's worth of SPI transfers
+    spi_controller_unlock_bus_of(device);
+}
+```
 
 ## Module
 
@@ -162,6 +174,7 @@ struct Module {
     const char* name;
     error_t (*start)(void);
     error_t (*stop)(void);
+    struct Driver* const* drivers;
     const struct ModuleSymbol* symbols;
     struct ModuleInternal* internal;
 };
@@ -172,13 +185,22 @@ There are many types of modules:
 - Device modules: Found in `Devices/`. These contain device-specific drivers and optionally initialization code for a device.
 - Other modules: Modules that contain specific features are found in `Modules/` (e.g. LVGL)
 
+`drivers` is an optional NULL-terminated array of driver pointers. `module_start()` calls `driver_construct_add()` on each in order; `module_stop()` calls `driver_remove_destruct()` on each in reverse order. This is the preferred way to register a module's drivers - only reach for manual `driver_construct_add()`/`driver_remove_destruct()` calls inside `start`/`stop` for drivers that need conditional or dynamic setup.
+
 For example:
 
 ```c
+Driver* const platform_esp32_drivers[] = {
+    &esp32_gpio_driver,
+    &esp32_i2c_driver,
+    NULL
+};
+
 struct Module platform_module = {
     .name = "platform-esp32",
-    .start = start, // register ESP32 drivers
-    .stop = stop, // deregister ESP32 drivers
+    .start = NULL,
+    .stop = NULL,
+    .drivers = platform_esp32_drivers,
     .symbols = NULL,
     .internal = NULL
 };
