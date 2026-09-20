@@ -10,6 +10,10 @@ C++23 compiler. If you're running Ubuntu, this means you need Ubuntu 24.04 or ne
 
 If you only want to run the simulator from a downloaded Tactility release, you only need the `mesa` and/or `mesa-util` dependencies.
 
+*(macOS)*
+
+macOS simulator support is a work in progress.
+
 *(Windows 11)*
 
 If you install WSL and Ubuntu, the simulator should work out-of-the-box.
@@ -23,7 +27,7 @@ Install WSL and open the Ubuntu application from your start menu, then follow th
 Note: It was reported that building the project from somewhere in `/mnt/c/` does not work.
 Use a folder somewhere in the home directory instead (`cd ~`).
 
-## Building on Linux
+## Building on Linux or macOS
 
 To run the simulator you will need to install these dependencies:
 
@@ -41,6 +45,12 @@ pacman -S base-devel git cmake mesa
 *(Fedora)*
 ```sh
 sudo dnf install git cmake SDL2_gfx-devel.x86_64 libXext-devel.x86_64 wayland-devel.x86_64 libxkbcommon-devel.x86_64
+```
+
+*(macOS)*
+```sh
+# Install Xcode Command Line Tools
+xcode-select --install
 ```
 
 Other Linux distros are also expected to work with either X11 or Wayland, as SDL is compiled with both enabled.
@@ -74,11 +84,3 @@ FreeRTOS froms the base for all Tactility development and it requires POSIX thre
 There is [a work-around with a custom "port layer"](https://www.freertos.org/Documentation/02-Kernel/03-Supported-devices/04-Demos/03-Emulation-and-simulation/Windows/FreeRTOS-Windows-Simulator-Emulator-for-Visual-Studio-and-Eclipse-MingW)
 that makes it run with MingW and Visual Studio, but it's currently not being considered to actively support this. 
 
-## Building on macOS
-
-macOS is currently not supported. The simulator can be built, but it crashes on starting it.
-
-The problem is that macOS requires SDL Window creation to happen on the main thread, but that in itself
-also requires the rendering and event loop to be on the main thread (otherwise you get a black screen).
-This can't be done currently with the default LVGL+SDL+FreeRTOS setup.
-It might be possible in the future, by making a custom stack that combines SDL with LVGL, but it's a big time investment.
