@@ -1,32 +1,19 @@
 # Symbols
 
-The list of available function is limited. This page explains how to add new ones and how to test them.
+Apps can only call the functions that the firmware exports. This page explains how symbols are exported, how to add new ones and how to test them.
 
-## Core symbols
+## How symbols are exported
 
-Symbols relating to libc, string and other basic functionality are registered in the `TactilityC` subproject:
+Every [kernel module](kernel-concepts/module.md) can export symbols through the `symbols` field of its `struct Module`: a table of `ModuleSymbol` entries, terminated by `MODULE_SYMBOL_TERMINATOR`. When an app is loaded, its undefined symbols are looked up in the tables of the modules in the firmware.
 
-1. Add the new symbol to `tt_init.cpp`.
-2. Build a new device firmware and flash it.
-
-Note: You don't need to publish and use a new `TactilitySDK`, as the libc function is available via an existing header file that is available to any external app project.
-
-## Module symbols
-
-Some functionality is part of a (kernel) module, such as `lvgl-module` or `http-module`:
 ```c
 const struct ModuleSymbol lvgl_module_symbols[] = {
+    DEFINE_MODULE_SYMBOL(lvgl_lock),
+    DEFINE_MODULE_SYMBOL(lvgl_unlock),
     DEFINE_MODULE_SYMBOL(lv_event_get_code),
-    DEFINE_MODULE_SYMBOL(lv_event_get_indev),
-    DEFINE_MODULE_SYMBOL(lv_event_get_key),
-    DEFINE_MODULE_SYMBOL(lv_event_get_param),
     /* ... */
     MODULE_SYMBOL_TERMINATOR
 };
-
-static error_t start() { /* Initialize LVGL memory and task(s) */ }
-
-static error_t stop() { /* Stop LVGL tasks and free up memory */ }
 
 struct Module lvgl_module = {
     .name = "lvgl",
@@ -37,25 +24,49 @@ struct Module lvgl_module = {
 };
 ```
 
-Modules are found in these locations:
+Modules usually keep their table in `source/symbols.c` (e.g. `Modules/lvgl-module/source/symbols.c`, `TactilityKernel/source/symbols.c`).
 
-- `Drivers/`: Older style drivers and newer module-based ones
-- `Modules/`: Contains functionality modules
-- `Platforms/`: Platform modules (e.g. ESP32 or POSIX) 
-- `TactilityKernel/`: The core kernel/system.
+`tactility/module.h` has three macros for the entries:
+- `DEFINE_MODULE_SYMBOL(symbol)`: exports a function or variable under its own name.
+- `DEFINE_MODULE_SYMBOL_SIGNATURE(symbol, type)`: for overloaded functions (e.g. C++ math functions for `float` and `double`), where `type` picks the overload.
+- `DEFINE_MODULE_SYMBOL_ALIAS(name, symbol)`: exports a function under a different name, e.g. so that apps built against an old name keep working after a rename.
 
-## Exposing a symbol for new functionality
+## Where symbols live
 
-New Tactility symbols should be part of a kernel module whenever possible. Legacy symbol types can remain part of `TactilityC` for now.
+- **C library:** `Modules/c-symbols-module` exports the C standard library functions that apps can use: memory, strings, `stdio`, math, time, etc.
+- **Kernel:** `TactilityKernel/source/symbols.c` exports the kernel API: devices, drivers, GPIO, I2C, displays, threads, timers, logging, etc.
+- **Modules:** every module in `Modules/` exports its own API, e.g. `lvgl-module` (LVGL and Tactility's widgets), `app-module`, `http-module` and `wifi-module`.
+- **Platforms:** `Platforms/` contains the platform modules (e.g. ESP32 or POSIX).
+- **Drivers:** driver modules in `Drivers/` can export functions for their own device types.
+
+## Exposing a new symbol
+
+1. Add a `DEFINE_MODULE_SYMBOL()` entry to the symbol table of the module that implements the function. New functionality belongs in a kernel module.
+2. Make sure the function is declared in a public header of that module (`include/`), so that apps can include it.
+3. Build the firmware and flash it.
+
+A function from the C standard library only needs step 1 (in `c-symbols-module`) and step 3. Apps can already use it, because its header is part of the toolchain.
+
+For anything else, apps also need a new TactilitySDK with the module's headers (see below). The SDK includes the modules that are listed in `Buildscripts/release-sdk-modules.txt`, so a new module that apps use must be added there.
 
 ## Building TactilitySDK locally
 
-When you export new symbols, you'll need to build your own SDK locally:
+When you export new symbols, you'll need to build your own SDK locally to build apps against them:
 
 1. Open a terminal and navigate to the Tactility project root folder.
-2. Build the firmware for the relevant target (e.g. ESP32 S3) with `idf.py build`
-3. Make sure that the `release/` directory either doesn't exist or doesn't have a previous SDK in it.
-4. Run `Buildscripts/release-sdk-current.sh`
-5. Set environment variable `TACTILITY_SDK_PATH` - for example: `export TACTILITY_SDK_PATH=/path/to/Tactility/release/TactilitySDK`
-6. Run `tactility.py build esp32s3 --local-sdk` (change "esp32s3" to the relevant hardware target where applicable)
+2. Build the firmware for the relevant target (e.g. ESP32-S3) with `idf.py build`.
+3. Run `python Buildscripts/release-sdk-current.py`. It creates the SDK in `release/TactilitySDK/<version>-<target>/TactilitySDK`, where `<version>` comes from `version.txt`.
+   - With an activated ESP-IDF environment, it builds the SDK for the target in `sdkconfig`.
+   - Without one, it builds the SDK for the simulator (`posix-<architecture>`).
+4. Set the environment variable `TACTILITY_SDK_PATH` to the folder that holds the SDK versions, for example: `export TACTILITY_SDK_PATH=/path/to/Tactility/release/TactilitySDK`
+5. In the app's folder, run `python tactility.py build --architecture esp32s3 --local-sdk` (change `esp32s3` to the relevant hardware target where applicable). The app's `target.sdk` in `manifest.properties` must match the SDK's version.
 
+## Testing
+
+Run the app on a device with the new firmware. When a function or variable that the app uses isn't exported, the app fails to load, and the log names it, e.g.:
+
+```
+E (5156) ELF: Can't find symbol lv_obj_set_flag
+```
+
+`Can't find common <name>` is logged for a missing variable, or for a C++ symbol (e.g. from `std::shared_ptr`) that the app defines itself. For the latter, make sure that the app was built with an up-to-date SDK, which links apps so that they use their own definitions.

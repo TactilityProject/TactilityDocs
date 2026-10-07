@@ -3,7 +3,7 @@
 ## Software
 
 - GCC compiler that supports C++23. If you're running Ubuntu, this means you need Ubuntu 24.04 or newer.
-- [ESP-IDF v5.5](https://docs.espressif.com/projects/esp-idf/en/v5.5/esp32/get-started/index.html) or a newer v5.5.x
+- [ESP-IDF v6.1](https://docs.espressif.com/projects/esp-idf/en/v6.1/esp32/get-started/index.html) or a newer v6.1.x
 - Linux, macOS, or Windows (Win11 natively or via WSL2 with Ubuntu 24.04 or newer) (\*)
 
 (\*) Continuously tested with latest Fedora (x86-64) and Ubuntu 24.04 (x86-64). Sporadically tested with latest macOS (aarch64). The simulator is currently only supported on Linux and Windows+WSL2.

@@ -39,12 +39,17 @@ See the [device.properties documentation](device-development/device-properties.m
 
 Use `Devices/lilygo-tdeck/` as a reference.
 
-You'll also need a `devicetree.yaml` file and a `.dts` file.
+You'll also need a `module.yaml` file and a `.dts` file (see [Devicetree](kernel-concepts/devicetree.md)).
 
-Create a `Source/module.cpp` or an equivalent `.c` file.
-This file must contain a `struct Module your_device_identifier_module = { ... }` 
+Create a `source/module.cpp` or an equivalent `.c` file.
+This file must contain a `struct Module your_device_identifier_module = { ... }` (see [Module](kernel-concepts/module.md))
+
+If your device doesn't need any module start/stop logic (an "empty" module, with `.start`/`.stop`
+set to `nullptr`), you can skip the `source/` folder and `CMakeLists.txt` entirely and set
+`dts-only: true` in `module.yaml` instead. This tells the devicetree compiler not to look for a
+module symbol for this device, and keeps it out of the CMake component tree.
 
 Drivers based on the `TactilityKernel` subproject. The drivers are found in `Platforms/` and `Drivers/`.
 
-Explore the [drivers documentation](device-development/drivers.md).
+Explore the [Kernel Concepts](kernel-concepts/driver.md) for how [drivers](kernel-concepts/driver.md), [devices](kernel-concepts/device.md) and [modules](kernel-concepts/module.md) work.
 

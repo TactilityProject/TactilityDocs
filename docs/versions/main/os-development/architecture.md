@@ -3,7 +3,7 @@
 ## Layer Stack
 
 - **Tactility**: The main project which is used to build the firmware and simulator builds. It ties everything together with wrappers and some basic applications.
-- **TactilityKernel**: The kernel with C API: device/driver/module lifecycle, concurrency primitives (thread, mutex, timer, dispatcher), filesystem, logging. Header convention: `<tactility/*.h>` (lowercase snake_case). See [Drivers](device-development/drivers.md) for the device/driver/module system.
+- **TactilityKernel**: The kernel with C API: device/driver/module lifecycle, concurrency primitives (thread, mutex, timer, dispatcher), filesystem, logging. Header convention: `<tactility/*.h>` (lowercase snake_case). See the Kernel Concepts ([Driver](kernel-concepts/driver.md), [Device](kernel-concepts/device.md), [Module](kernel-concepts/module.md)) for the device/driver/module system.
 - **TactilityFreeRtos**: Thin C++ wrappers around FreeRTOS primitives.
 
 ## App Framework
@@ -19,7 +19,7 @@ Services implement `tt::service::Service` with a `ServiceManifest`. Services are
 The main driver abstractions are in TactilityKernel. Implementations of drivers are found in `Drivers/`.
 Secondary driver modules are located at `Modules/`.
 
-Drivers are based on the Linux driver subsystem model described in [Drivers](device-development/drivers.md): modules register drivers, drivers bind to devices via `compatible` strings from the devicetree.
+Drivers are based on the Linux driver subsystem model described in [Driver](kernel-concepts/driver.md): modules register drivers, drivers bind to [devices](kernel-concepts/device.md) via `compatible` strings from the [devicetree](kernel-concepts/devicetree.md).
 
 ## Platform Abstraction
 
