@@ -60,10 +60,13 @@ Remember that the widgets might not exist at that moment (see [Windows](#windows
 |---|---|---|
 | Toolbar | `<lvgl/widgets/toolbar.h>` | The bar at the top of an app, with a close button, a title and actions |
 | Card | `<lvgl/widgets/card.h>` | A container for a group of related settings or content |
-| Chip | `<lvgl/widgets/chip.h>` | A small selectable option, e.g. a filter |
-| Icon button | `<lvgl/widgets/icon_button.h>` | A button with an icon, in standard, filled or tonal style |
+| List | `<lvgl/widgets/list.h>` | A column of full-width buttons, with optional section headers |
+| Chip | `<lvgl/widgets/chip.h>` | A small selectable option (a "pill"), e.g. a filter or one choice out of a few |
+| Icon button | `<lvgl/widgets/icon_button.h>` | A button with an icon, in standard, filled or tonal style. It can also be an on/off toggle |
 | Badge | `<lvgl/widgets/badge.h>` | A small dot that marks an item |
-| Slider box | `<lvgl/widgets/sliderbox.h>` | A slider with - and + buttons, for devices without touch |
+| Slider box | `<lvgl/widgets/sliderbox.h>` | A slider with - and + buttons and a value label, so it also works without touch |
+| Page indicator | `<lvgl/widgets/page_indicator.h>` | A row of dots that shows the current page of a paged view |
+| Focus container | `<lvgl/widgets/focus_container.h>` | A transparent container that is selectable as a whole, e.g. a group of icons with one click action |
 | Spinner | `<lvgl/widgets/spinner.h>` | A busy indicator |
 
 ### Toolbar
@@ -77,6 +80,78 @@ lv_obj_t* enabled = lvgl_toolbar_add_switch_action(toolbar);
 ```
 
 Avoid dropdowns in the toolbar (`lvgl_toolbar_add_dropdown_action()`): they're deprecated, as the toolbar can't be navigated with the arrow keys when it has one.
+
+### List
+
+```c
+lv_obj_t* list = lvgl_list_create(parent);
+lvgl_list_add_text(list, "Networks");
+lv_obj_t* button = lvgl_list_add_button(list, LV_SYMBOL_WIFI, "Home");
+lv_obj_add_event_cb(button, on_network_pressed, LV_EVENT_SHORT_CLICKED, ctx);
+```
+
+### Chips
+
+Chips don't select themselves: give the selected one `LV_STATE_CHECKED`. Put a group of chips in a container with grid navigation, so the arrow keys move between the chips and up/down move to the next group (see [Input and Focus](app-development/input.md)):
+
+```c
+lv_obj_t* chips = lv_obj_create(parent);
+lv_obj_set_size(chips, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+lv_obj_set_flex_flow(chips, LV_FLEX_FLOW_ROW);
+for (int i = 0; i < OPTION_COUNT; i++) {
+    lv_obj_t* chip = lvgl_chip_create(chips);
+    lv_label_set_text(lv_label_create(chip), OPTION_NAMES[i]);
+    lv_obj_add_event_cb(chip, on_option_pressed, LV_EVENT_SHORT_CLICKED, ctx);
+}
+lvgl_grid_navigation_add(chips);
+// When an option is selected:
+lv_obj_set_state(selected_chip, LV_STATE_CHECKED, true);
+```
+
+### Icon button
+
+`lvgl_icon_button_create()` makes a standard icon button. `lvgl_icon_button_create_variant()` also offers `LVGL_ICON_BUTTON_FILLED` (for the most important action) and `LVGL_ICON_BUTTON_TONAL`.
+
+A standard icon button can be an on/off toggle: the theme shows it as "on" while it's checked.
+
+```c
+lv_obj_t* toggle = lvgl_icon_button_create(parent);
+lv_obj_add_flag(toggle, LV_OBJ_FLAG_CHECKABLE);
+lv_obj_add_event_cb(toggle, on_toggled, LV_EVENT_VALUE_CHANGED, ctx);
+lv_label_set_text(lv_label_create(toggle), LVGL_ICON_SHARED_WIFI);
+```
+
+LVGL switches checkable widgets with the arrow keys, so put toggles (and switches) in a grid navigation container instead of letting them be focused directly.
+
+### Slider box
+
+```c
+lv_obj_t* volume = lvgl_sliderbox_create(parent, 0, 100, 10, 50);
+lvgl_sliderbox_add_value_changed_cb(volume, on_volume_changed, ctx);
+int32_t value = lvgl_sliderbox_get_value(volume);
+```
+
+With a keyboard, the slider box is one stop: left and right move between the - button, the slider and the + button.
+
+### Page indicator
+
+```c
+lv_obj_t* dots = lvgl_page_indicator_create(parent);
+lvgl_page_indicator_set_page_count(dots, 3);
+lvgl_page_indicator_set_page(dots, 0);
+```
+
+When the dots don't fit in the indicator's maximum width (`lv_obj_set_style_max_width()`), it shows the page number as text instead (e.g. "2/5").
+
+### Focus container
+
+A focus container is transparent and has no padding. The theme only shows a focus ring around it, so a group of widgets can be selected and clicked as one:
+
+```c
+lv_obj_t* group = lvgl_focus_container_create(parent);
+lv_obj_add_flag(group, LV_OBJ_FLAG_CLICKABLE);
+lv_obj_add_event_cb(group, on_group_pressed, LV_EVENT_SHORT_CLICKED, ctx);
+```
 
 ## Layout and screen sizes
 
