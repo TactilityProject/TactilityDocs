@@ -65,7 +65,6 @@ Driver pi4ioe5v6408_driver = {
     .stop_device = stop,
     .api = &pi4_gpio_api,
     .device_type = &GPIO_CONTROLLER_TYPE,
-    .owner = &pi4ioe5v6408_module,
 };
 ```
 

@@ -15,7 +15,6 @@ struct Driver {
     error_t (*probe)(struct Device* device);
     const void* api;
     const struct DeviceType* device_type;
-    const struct Module* owner;
     struct DriverInternal* internal;
 };
 ```
@@ -30,7 +29,6 @@ Driver esp32_i2c_master_driver = {
     .stop_device = stop,
     .api = &ESP32_I2C_MASTER_API,
     .device_type = &I2C_CONTROLLER_TYPE,
-    .owner = &platform_esp32_module,
     .internal = nullptr,
 };
 ```
@@ -44,10 +42,11 @@ Driver esp32_i2c_master_driver = {
 | `probe` | Optional: reports whether the hardware is present (see [Hotplug](#hotplug)). `NULL` means it's always present |
 | `api` | The functions of the driver's device type, e.g. a `DisplayApi` or an `I2cControllerApi` |
 | `device_type` | The type of the devices this driver creates (e.g. `&I2C_CONTROLLER_TYPE`), so that they can be found by type |
-| `owner` | The module that owns the driver. Can be `NULL` |
 | `internal` | The kernel's internal state. Initialize it to `NULL`, and don't touch it |
 
 Fields that aren't used can be left out of the initializer, so they're `NULL`.
+
+A module becomes the owner of the drivers it registers when it starts. `driver_get_owner()` returns that module, or `NULL` for a driver that wasn't registered by a module.
 
 ## Starting and stopping devices
 

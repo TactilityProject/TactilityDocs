@@ -57,7 +57,6 @@ Driver gc9a01_driver = {
     .stop_device = stop,
     .api = &gc9a01_display_api,
     .device_type = &DISPLAY_TYPE,
-    .owner = &gc9a01_module,
 };
 ```
 
