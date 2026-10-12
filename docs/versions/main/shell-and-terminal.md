@@ -44,6 +44,32 @@ Standard tools:
 | `which` | Show where a command comes from |
 | `help` | List the available commands |
 
+On devices with Wi-Fi, `wifi` controls the Wi-Fi connection:
+
+| Command | Purpose |
+|---|---|
+| `wifi status` | Show the radio state, and the network, IP address and signal strength when connected |
+| `wifi radio on`, `wifi radio off` | Turn the Wi-Fi radio on or off |
+| `wifi scan` | List the nearby access points. Saved networks are marked with `*` |
+| `wifi connect -s <ssid> [-p <password>] [-c <channel>] [--no-save]` | Connect to a network. Without `-p`, it uses the saved password, or connects to an open network. A new network is saved once connected, unless you add `--no-save` |
+| `wifi disconnect` | Disconnect from the network |
+| `wifi saved` | List the saved networks |
+| `wifi forget -s <ssid>` | Remove a saved network |
+
+On devices with mesh networking support, `mesh` controls the mesh network, like the **Mesh Settings** app:
+
+| Command | Purpose |
+|---|---|
+| `mesh status` | Show whether mesh is on, and its backend, preset and region |
+| `mesh on`, `mesh off` | Turn mesh networking on or off |
+| `mesh backend [<id>]` | List the backends (e.g. `meshcore`, `meshtastic`), or select one |
+| `mesh region [<name>]` | List the radio regions (e.g. `EU_868`), or set yours |
+| `mesh preset [<name>]` | List the radio presets of the backend, or select one |
+| `mesh channels` | List the channels |
+| `mesh join <#channel>` | Join a hashtag channel, e.g. `mesh join #test` |
+
+The lists mark the current choice with `*`. The radio stays off until you set a region.
+
 Installed apps that are command-line tools (headless apps) are also available as commands, by the name of their binary.
 
 ### Files and folders
