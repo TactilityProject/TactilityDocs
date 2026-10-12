@@ -1,7 +1,9 @@
 - Using Tactility
   - [Installing Firmware](installing-firmware.md)
+  - [Navigation](navigation.md)
   - [Configuration](configuration.md)
   - [Shell and Terminal](shell-and-terminal.md)
+  - [Mesh Networking](mesh.md)
 - App Development
   - [Requirements](requirements.md)
   - [Getting Started](app-development/getting-started.md)
@@ -11,6 +13,7 @@
   - [Input Devices](app-development/input-devices.md)
   - [Storage and Settings](app-development/storage.md)
   - [Insets](app-development/insets.md)
+  - [Mesh](app-development/mesh.md)
   - [Symbols](app-development/symbols.md)
 - Kernel Concepts
   - [Module](kernel-concepts/module.md)
@@ -31,6 +34,7 @@
   - [IO Expander](driver-development/io-expander.md)
   - [Keyboard](driver-development/keyboard.md)
   - [Pointer](driver-development/pointer.md)
+  - [Radio](driver-development/radio.md)
   - [SPI Controller](driver-development/spi-controller.md)
 - OS Development
   - [Project Structure](os-development/project-structure.md)
@@ -39,6 +43,7 @@
   - [Testing](os-development/testing.md)
   - [Architecture](os-development/architecture.md)
   - [Icons and Fonts](os-development/icons-and-fonts.md)
+  - [Mesh Backends](os-development/mesh-backends.md)
   - [Releases](os-development/releases.md)
 - Other
   - [Licenses & Copyrights](../licenses-and-copyrights.md)

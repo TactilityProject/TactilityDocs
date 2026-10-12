@@ -44,6 +44,7 @@ The device's full name is the vendor followed by the name. When the vendor is em
 - `hardware.spiRamSpeed`: the SPI RAM frequency (e.g. `80M`, `120M` or `200M`). Don't add spaces and always use an upper-case `M`. Required when `hardware.spiRam` is `true`.
 - `hardware.spiRamXipDisabled`: optional boolean for ESP32-S3 devices. Set it to `true` when the device fails to boot with "PSRAM space not enough for the Flash instructions". Code and read-only data then stay in flash instead of being copied to SPI RAM. Defaults to `false`.
 - `hardware.bluetooth`: optional boolean to enable Bluetooth (NimBLE). Defaults to `false`.
+- `hardware.mesh`: optional boolean to build [mesh networking](mesh.md) into the firmware. Requires a LoRa radio in the devicetree, and SPI RAM. Defaults to `false`.
 - `hardware.usbHostEnabled`: optional boolean to enable USB host support (hubs, mass storage, etc.). Defaults to `false`.
 
 ### USB device
