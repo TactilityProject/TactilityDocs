@@ -7,17 +7,7 @@ Tactility can send and receive text messages over a LoRa mesh network, without W
 
 One protocol is active at a time. Your device then talks to other MeshCore or Meshtastic nodes nearby.
 
-## Supported devices
-
-Mesh networking is available on devices with a LoRa radio and PSRAM:
-
-- LilyGo T-Deck Plus
-- LilyGo T-Deck Max
-- LilyGo T-Deck Pro
-- LilyGo T-LoRa Pager
-- Seeed Studio Wio Tracker L2 Pro
-
-Other devices with a radio (e.g. the Heltec WiFi LoRa 32 v3 or the T-Embed CC1101) can use the radio, but don't include mesh networking.
+Mesh networking requires hardware support, so it's not available on all devices.
 
 ## Getting started
 
