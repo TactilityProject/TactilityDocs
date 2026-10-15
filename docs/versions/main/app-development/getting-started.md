@@ -44,6 +44,12 @@ HelloWorld/
 
 The easiest way to start a new app is to copy one of the examples and change its manifest.
 
+## Installing the tt tool
+
+Apps are built, installed and run with the [tt tool](app-development/tt.md). Download [tt.zip](https://cdn.tactilityproject.org/sdk/tt.zip) from `https://cdn.tactilityproject.org/sdk/tt.zip` and extract it into your project's root folder. It needs Python 3.
+
+The example apps in [TactilityApps](https://github.com/TactilityProject/TactilityApps) already include it.
+
 ## Building
 
 After you went through the [Fundamentals](app-development/fundamentals.md) to set up a new application,
@@ -51,21 +57,23 @@ or if you downloaded one of the example apps, you can build it from the app's fo
 
 ```bash
 # Either build for all platforms in the manifest's target.platforms:
-python tactility.py build
+./tt app build
 # Or do a quicker build for just 1 platform during development:
-python tactility.py build --architecture esp32s3
+./tt app build --architecture esp32s3
 ```
 
-`tactility.py` downloads the TactilitySDK version from the manifest's `target.sdk` automatically. It builds the app for every platform and creates the package in `build/<package id>.app`.
+On Windows, use `tt` instead of `./tt`.
+
+`tt` downloads the TactilitySDK version from the manifest's `target.sdk` automatically. It builds the app for every platform and creates the package in `build/<package id>.app`.
 
 If you have more than one app in your repository, you can specify its path:
 
 ```bash
-python tactility.py build --path Apps/SomeApp
-python tactility.py build --path Apps/OtherApp
+./tt app build --path Apps/SomeApp
+./tt app build --path Apps/OtherApp
 ```
 
-Run `python tactility.py --help` for all commands and options, and see the [TactilityTool](https://github.com/TactilityProject/TactilityTool) project for more documentation.
+Run `./tt help` for all commands, and see [The tt Tool](app-development/tt.md) for more documentation.
 
 To build against a firmware that you built yourself (e.g. with new symbols), see [Building TactilitySDK locally](app-development/symbols.md?id=building-tactilitysdk-locally).
 
@@ -73,29 +81,37 @@ To build against a firmware that you built yourself (e.g. with new symbols), see
 
 First, make sure to set up the Tactility device:
 - Wi-Fi should be on, and connected to the same network as your computer
-- Development service should be enabled (via Settings -> Development)
+- The development server should be on (via Settings -> Development, see [Remote Access](user-guide/remote-access.md))
+
+Tell `tt` which device to use. The Development app shows its IP address:
+
+```bash
+./tt host 192.168.1.123
+```
+
+Make sure you target the right IP address! You can also pass it to a single command with `--host`.
 
 Install the app on your device as follows:
 
 ```bash
-python tactility.py install --host 192.168.1.123
+./tt app install
 ```
 
-Make sure you target the right IP address! The package contains the binaries for all of its platforms, so the device picks its own.
+The first time, `tt` shows the device's fingerprint and asks whether to trust it, and the device asks whether to accept your computer. See [Remote Access](user-guide/remote-access.md). The package contains the binaries for all of its platforms, so the device picks its own.
 
 Once the app is installed, you can start it remotely:
 
 ```bash
-python tactility.py run --host 192.168.1.123
+./tt app run
 ```
 
 If you want to build, install and run with one command:
 
 ```bash
 # Either run (b)uild-(i)nstall-(r)un:
-python tactility.py bir --host 192.168.1.123 --architecture esp32s3
+./tt app bir --architecture esp32s3
 # Or just "app goes brrr":
-python tactility.py brrr --host 192.168.1.123 --architecture esp32s3
+./tt app brrr --architecture esp32s3
 # Whatever floats your boat
 ```
 
@@ -104,10 +120,14 @@ python tactility.py brrr --host 192.168.1.123 --architecture esp32s3
 To remove the app again:
 
 ```bash
-python tactility.py uninstall --host 192.168.1.123
+./tt app uninstall
 ```
 
 ## Debugging
+
+### Remote shell
+
+`./tt shell` opens a shell on the device, to look at files and run commands while you test your app. `./tt push` and `./tt pull` copy files to and from the device. See [The tt Tool](app-development/tt.md).
 
 ### Serial monitor
 

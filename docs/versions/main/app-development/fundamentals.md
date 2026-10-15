@@ -194,10 +194,10 @@ The window manager deletes and recreates the window's widgets when another windo
 The [simulator](os-development/simulator.md) runs Tactility on your computer (Linux, or WSL on Windows). Building and testing an app there is much faster than flashing and testing on a device, and it's easier to debug.
 
 1. Add `posix-x86_64` to the app's `target.platforms` in `manifest.properties`.
-2. Start the simulator, and enable the Development service in its Settings app (Settings -> Development).
+2. Start the simulator, and turn on the development server in its Settings app (Settings -> Development).
 3. Build, install and run the app on the simulator, just like on a device, with `localhost` as the host:
    ```bash
-   python tactility.py bir --host localhost --architecture posix-x86_64
+   ./tt app bir --host localhost --architecture posix-x86_64
    ```
 
 Test on a real device before releasing your app, as some things only exist there or behave differently on hardware, such as a device's specific drivers, its memory limits and its display.

@@ -27,7 +27,7 @@ Favourites are only for apps, not for settings.
 
 ## System menu
 
-The system menu has quick toggles for Wi-Fi, GPS, Bluetooth and Mesh, and a power off button. It only shows the ones that your device has (Mesh appears once it's set up, see [Mesh Networking](mesh.md)).
+The system menu has quick toggles for Wi-Fi, GPS, Bluetooth and Mesh, and a power off button. It only shows the ones that your device has (Mesh appears once it's set up, see [Mesh Networking](user-guide/mesh.md)).
 
 To open it:
 - **Swipe down** on the statusbar.

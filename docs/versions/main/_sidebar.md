@@ -1,12 +1,14 @@
-- Using Tactility
-  - [Installing Firmware](installing-firmware.md)
-  - [Navigation](navigation.md)
-  - [Configuration](configuration.md)
-  - [Shell and Terminal](shell-and-terminal.md)
-  - [Mesh Networking](mesh.md)
+- User Guide
+  - [Installing Firmware](user-guide/installing-firmware.md)
+  - [Navigation](user-guide/navigation.md)
+  - [Configuration](user-guide/configuration.md)
+  - [Shell and Terminal](user-guide/shell-and-terminal.md)
+  - [Remote Access](user-guide/remote-access.md)
+  - [Mesh Networking](user-guide/mesh.md)
 - App Development
   - [Requirements](requirements.md)
   - [Getting Started](app-development/getting-started.md)
+  - [The tt Tool](app-development/tt.md)
   - [Fundamentals](app-development/fundamentals.md)
   - [UI](app-development/ui.md)
   - [Input and Focus](app-development/input.md)

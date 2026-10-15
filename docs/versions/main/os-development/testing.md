@@ -40,12 +40,24 @@ Each suite is its own executable, registered in `Tests/CMakeLists.txt`:
 `Tests/SdkIntegration` isn't a Doctest suite. It's a real app project that verifies a generated `TactilitySDK` release actually builds and links against. Generate an SDK bundle first, then build against it:
 
 ```bash
-python3 Buildscripts/release-sdk-posix.py <target_path>
-TACTILITY_SDK_PATH=<target_path> cmake -S Tests/SdkIntegration -B <build_path> -G Ninja
-ninja -C <build_path>
+python3 Buildscripts/release-current.py
+cd Tests/SdkIntegration
+TACTILITY_SDK_PATH=../../release python3 ../../tt.py app build -a posix-x86_64
 ```
 
+CI does the same for every ESP32 target and the simulator, with `tt.py`, so it also tests the tools.
+
 Run it after any change to `Buildscripts/TactilitySDK/`, `tactility_component_register()`, or what a released SDK bundles. A passing `ninja build-tests` doesn't catch a broken SDK release, since that's a completely separate packaging/consumption path.
+
+## tt tests
+
+The [tt tool](app-development/tt.md) and its update tools have Python tests, which use a local fake CDN:
+
+```bash
+python3 -m unittest discover -s Tests/Python -p '*_test.py'
+```
+
+CI runs them before it packages `tt`.
 
 ## Where tests live
 

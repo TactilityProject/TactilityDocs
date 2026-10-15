@@ -2,7 +2,7 @@
 
 Apps can send and receive text messages over the mesh network with `<mesh/mesh.h>`. The API is the same for every mesh protocol (MeshCore, Meshtastic): the mesh service runs the protocol, stores the messages and reports events.
 
-See [Mesh Networking](mesh.md) for what the user sets up, and which devices support it.
+See [Mesh Networking](user-guide/mesh.md) for what the user sets up, and which devices support it.
 
 ## Availability
 

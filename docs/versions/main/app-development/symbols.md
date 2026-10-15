@@ -55,11 +55,13 @@ When you export new symbols, you'll need to build your own SDK locally to build 
 
 1. Open a terminal and navigate to the Tactility project root folder.
 2. Build the firmware for the relevant target (e.g. ESP32-S3) with `idf.py build`.
-3. Run `python Buildscripts/release-sdk-current.py`. It creates the SDK in `release/TactilitySDK/<version>-<target>/TactilitySDK`, where `<version>` comes from `version.txt`.
+3. Run `python Buildscripts/release-current.py`. It creates the SDK in `release/sdk/<version>/platform-<target>/TactilitySDK`, and the [tt](app-development/tt.md) tools in `release/sdk/<version>/tools`, where `<version>` comes from `version.txt`.
    - With an activated ESP-IDF environment, it builds the SDK for the target in `sdkconfig`.
    - Without one, it builds the SDK for the simulator (`posix-<architecture>`).
-4. Set the environment variable `TACTILITY_SDK_PATH` to the folder that holds the SDK versions, for example: `export TACTILITY_SDK_PATH=/path/to/Tactility/release/TactilitySDK`
-5. In the app's folder, run `python tactility.py build --architecture esp32s3 --local-sdk` (change `esp32s3` to the relevant hardware target where applicable). The app's `target.sdk` in `manifest.properties` must match the SDK's version.
+4. Set the environment variable `TACTILITY_SDK_PATH` to the `release` folder, for example: `export TACTILITY_SDK_PATH=/path/to/Tactility/release`
+5. In the app's folder, run `./tt app build --architecture esp32s3` (change `esp32s3` to the relevant hardware target where applicable). The app's `target.sdk` in `manifest.properties` must match the SDK's version.
+
+While `TACTILITY_SDK_PATH` is set, `tt` uses this SDK for every command. Unset it to use the downloaded SDKs again.
 
 ## Testing
 

@@ -70,7 +70,7 @@ On devices with mesh networking support, `mesh` controls the mesh network, like 
 
 The lists mark the current choice with `*`. The radio stays off until you set a region.
 
-Installed apps that are command-line tools (headless apps) are also available as commands, by the name of their binary.
+Installed apps that are command-line tools (headless apps) are also available as commands, by the name of their binary. Apps that are also hidden (`hidden=true` in their manifest) are not.
 
 ### Files and folders
 
@@ -79,11 +79,21 @@ The storage is mounted at `/sdcard` (SD card), `/data` (internal storage) and `/
 ### Scripts and programs
 
 - Run a shell script with `sh script.sh [arguments]`. The script gets its arguments as `$1`, `$2`, etc.
+- Run a command line with `sh -c "<command>"`, e.g. `sh -c "ls | wc"`.
 - Run an app binary directly by its path, e.g. `/sdcard/tools/hello.elf`.
+
+## Remote shell
+
+You can also use the shell from a computer on the same network, with the [tt tool](app-development/tt.md):
+
+- `./tt shell` opens an interactive shell.
+- `./tt shell <command>` runs one command and returns its exit code, e.g. `./tt shell ls /sdcard`. Quote a command with pipes or `;`, e.g. `./tt shell 'ls | wc'`.
+
+This needs the development server on the device, see [Remote Access](user-guide/remote-access.md).
 
 ## Writing command-line apps
 
-An app becomes a shell command when its manifest marks it as headless (`app.0.headless=true`). It then runs without a window, with the terminal as its standard input and output:
+An app becomes a shell command when its manifest marks it as headless (`app.0.headless=true`), and not as hidden. It then runs without a window, with the terminal as its standard input and output:
 - Read input with `getchar()`, `fgets()` or `read()`, and write output with `printf()`.
 - Arguments arrive in `main(argc, argv)`, like in a regular C program.
 - Return `0` from `main()` for success.
