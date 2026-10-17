@@ -10,9 +10,11 @@ Download [tt.zip](https://cdn.tactilityproject.org/sdk/tt.zip) and extract it in
 |---|---|
 | `tt.py` | The tool itself (needs Python 3) |
 | `tt` | Runs `tt.py` on Linux and macOS: `./tt` |
-| `tt.cmd` | Runs `tt.py` on Windows: `tt` |
+| `tt.ps1` | Runs `tt.py` in Windows PowerShell: `.\tt` |
 
-The first remote command (`shell`, `push`, `pull`, or installing and running apps) creates the computer's certificate, which needs the Python package `cryptography`: `pip install cryptography`.
+On Windows, PowerShell only runs scripts that its execution policy allows. If `.\tt` is blocked, unblock the downloaded script once with `Unblock-File .\tt.ps1`, or run `py tt.py` instead (e.g. `py tt.py app build`). From `cmd.exe`, always use `py tt.py`.
+
+The first remote command (`shell`, `push`, `pull`, `screenshot`, or installing and running apps) creates the computer's certificate, which needs the Python package `cryptography`: `pip install cryptography`.
 
 If you still use `tactility.py`: run `python tactility.py updateself`, then run `python tactility.py` once more. It installs `tt` next to it, and from then on it only refers to `tt`.
 
@@ -21,7 +23,7 @@ If you still use `tactility.py`: run `python tactility.py updateself`, then run 
 `tt` itself is small. Every command runs a tool that belongs to the TactilitySDK that your app targets:
 
 1. `tt` reads `target.sdk` from `manifest.properties` in the current folder. Without one, it uses the first `Apps/*/manifest.properties` or `apps/*/manifest.properties`.
-2. It downloads that SDK version's tools, and the SDK for each of the manifest's `target.platforms`, into `~/.tactility/sdk/<version>/`. This only happens once per version.
+2. It downloads that SDK version's tools, and the SDK for each of the manifest's `target.platforms` (every platform of the SDK for `target.platforms=all`), into `~/.tactility/sdk/<version>/`. This only happens once per version.
 3. It runs the command with that version's tools.
 
 So an app always uses tools that match its SDK, and different apps can target different SDK versions.
@@ -37,12 +39,13 @@ Run `tt help` in an app folder to list the commands of its SDK.
 | `tt shell <command>` | Run a command on the device, e.g. `tt shell ls /sdcard` |
 | `tt push <local path> <device path>` | Copy a file to the device |
 | `tt pull <device path> [local path]` | Copy a file from the device |
+| `tt screenshot [local path]` | Save a screenshot of the device's screen as a PNG file. Without a path, it's saved as `screenshot-<yyyy-mm-dd>.png` |
 | `tt host [hostname]` | Show or set the device that the remote commands use |
 | `tt ui` | Open a dashboard to build, install and run the apps in `Apps/` (needs the Python package `textual`) |
 | `tt update-self` | Update `tt` itself |
-| `tt update-sdk` | Download a newer build of the SDK that the app targets |
+| `tt update-sdk` | Download a newer build of the SDK that the app targets: its tools and its platforms together |
 
-`tt` checks for updates every 30 minutes and tells you when to run `tt update-self` or `tt update-sdk`.
+`tt` checks for updates every 30 minutes and tells you when to run `tt update-self` or `tt update-sdk`. It never replaces an installed SDK by itself, so your builds only change when you choose to update. When an app needs a platform that isn't installed yet, and its SDK version was published again since you installed it, `tt` asks you to run `tt update-sdk` first, so the tools and all platforms stay from the same build.
 
 ### tt app
 

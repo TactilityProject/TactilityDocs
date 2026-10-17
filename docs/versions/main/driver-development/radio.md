@@ -1,12 +1,13 @@
 # Radio
 
-A radio driver controls a packet radio transceiver, such as a Semtech SX1262 (LoRa, FSK) or a TI CC1101 (FSK, OOK). Consumers like the mesh service use the same API for every radio: they pick a modulation, set its parameters, turn the radio on, and then send and receive packets.
+A radio driver controls a packet radio transceiver, such as a Semtech SX1262 (LoRa, FSK), a TI CC1101 (FSK, OOK) or the ESP-NOW transport of the Wi-Fi radio. Consumers like the mesh service use the same API for every radio: they pick a modulation, set its parameters, turn the radio on, and then send and receive packets.
 
 Read the [Kernel Concepts](kernel-concepts/driver.md) first for how [drivers](kernel-concepts/driver.md), [devices](kernel-concepts/device.md) and [modules](kernel-concepts/module.md) work in general.
 
 Existing drivers to use as a reference:
 - `Drivers/sx126x-module`: SX1262 (LoRa, FSK, LR-FHSS transmit only), built on RadioLib
 - `Drivers/cc1101-module`: CC1101 (FSK, 4-FSK, OOK), built on RadioLib
+- `Tactility/Source/service/espnow/EspNowRadio.cpp`: ESP-NOW (`RADIO_MODULATION_ESPNOW`) on top of the ESP-NOW service
 - `Drivers/mock-drivers-module` (`mock,radio`): an in-process radio for the simulator and tests
 
 ## The driver
@@ -56,6 +57,7 @@ Parameters are `int32_t` values in base SI units (Hz, bit/s, dBm), so a frequenc
 | `RADIO_PARAMETER_PREAMBLE_LENGTH` | Symbols (LoRa) or bits | All |
 | `RADIO_PARAMETER_FREQUENCY_DEVIATION` | Hz | FSK, 4-FSK, MSK |
 | `RADIO_PARAMETER_DATA_RATE` | bit/s | FSK, 4-FSK, MSK, OOK |
+| `RADIO_PARAMETER_CHANNEL` | Channel number | ESP-NOW (Wi-Fi channel 1-14). Radios tuned by channel, not frequency, as 2.4 GHz doesn't fit the 32-bit frequency in Hz |
 | `RADIO_PARAMETER_BOOSTED_GAIN` | 0 or 1 | Driver-specific |
 | `RADIO_PARAMETER_NARROW_GRID` | 0 or 1 | LR-FHSS |
 | `RADIO_PARAMETER_CURRENT_LIMIT` | mA | PA over-current protection |
@@ -110,7 +112,7 @@ Radios usually share an SPI bus with a display or an SD card. Lock the bus for e
 ## What the kernel handles
 
 A driver doesn't need to implement these, as the kernel wrappers in `radio.cpp` take care of them:
-- **Regulatory region:** `radio_set_region()` makes `radio_set_parameter()` reject frequencies and power outside the region, and `radio_set_enabled()` reject a configuration that doesn't fit a band. Both return `ERROR_OUT_OF_RANGE`.
+- **Regulatory region:** ESP-NOW is exempt, as the Wi-Fi stack enforces the limits of its country. For other radios, `radio_set_region()` makes `radio_set_parameter()` reject frequencies and power outside the region, and `radio_set_enabled()` reject a configuration that doesn't fit a band. Both return `ERROR_OUT_OF_RANGE`.
 - **Ownership:** `radio_acquire()`, `radio_release()` and `radio_get_owner()` let consumers claim a radio. The claim is advisory, and doesn't affect RX subscriptions.
 - **Event subscriptions:** consumers subscribe with `radio_state_event_subscribe()`, `radio_rx_event_subscribe()` and `radio_tx_event_subscribe()`. The driver only emits.
 

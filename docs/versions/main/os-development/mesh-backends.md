@@ -7,7 +7,7 @@ Apps                        <mesh/mesh.h> (app SDK)
 mesh-module                 service, store, radio management, settings
   mesh-meshcore-module      MeshCore backend (Apache-2.0)
   mesh-meshtastic-module    Meshtastic backend (GPL-3.0)
-TactilityKernel radio.h     radio drivers (SX1262, CC1101, mock)
+TactilityKernel radio.h     radio drivers (SX1262, CC1101, ESP-NOW, mock)
 ```
 
 See [Mesh](app-development/mesh.md) for the app API, and [Radio](driver-development/radio.md) for the driver layer.
@@ -26,12 +26,12 @@ To keep GPL code out of the app SDK:
 `mesh-module` runs the `tactility.mesh` service. It starts when the user enables mesh (`mesh_set_enabled()`), and owns:
 
 - **One thread.** Every backend function runs on it, and backends call the `mesh_host_*()` functions only from those calls, so backends need no locking. API calls from apps that need backend state (e.g. `mesh_get_channels()`) are posted to the thread and waited for.
-- **The radio.** The service claims the first started radio that can send and receive LoRa with `radio_acquire(device, "mesh")`. It applies the active backend's radio profile, and turns on listen-before-talk. A radio that starts later (e.g. after a hotplug probe) is picked up by the service tick.
-- **The region.** The radio stays off while no region is set (`MESH_STATE_NO_REGION`). Tactility persists the region in `settings/radio.properties`, and applies it with `radio_set_region()` before the service starts. The kernel then rejects frequencies and power outside the region.
+- **The radio.** The service claims a started radio that can send and receive LoRa or ESP-NOW with `radio_acquire(device, "mesh")`. The default is the first radio that isn't ESP-NOW, or the user's choice by device name. It applies the active backend's radio profile, and turns on listen-before-talk. A radio that starts later (e.g. after a hotplug probe) is picked up by the service tick.
+- **The region.** A LoRa radio stays off while no region is set (`MESH_STATE_NO_REGION`). ESP-NOW doesn't need one. Tactility persists the region in `settings/radio.properties`, and applies it with `radio_set_region()` before the service starts. The kernel then rejects frequencies and power outside the region.
 - **The airtime budget.** Transmissions are limited to the duty cycle of the region over a sliding hour.
 - **The store.** See below.
 
-Only one backend is active, because the protocols use different sync words and radio settings. Switching backends turns the radio off, applies the new profile and turns it on again. Outgoing messages of the previous backend that weren't sent become `MESH_DELIVERY_BLOCKED`, and resume when that backend is active again.
+Only one backend is active, because the protocols use different sync words and radio settings. Switching backends or radios turns the radio off, applies the new profile and turns it on again. Presets only apply while a LoRa radio is in use. Outgoing messages of the previous backend that weren't sent become `MESH_DELIVERY_BLOCKED`, and resume when that backend is active again.
 
 ## Writing a backend
 
@@ -62,12 +62,15 @@ static error_t start(void) {
 | `create(host)` | Create the backend state when the backend becomes active. `host` is valid until `destroy()` |
 | `destroy(backend)` | Free the state, when another backend becomes active or the service stops |
 | `presets` | Optional `NULL`-terminated list of preset names. Index 0 is the default |
-| `get_radio_profile(backend, region, preset, profile)` | The modulation, frequency, bandwidth, spreading factor, coding rate, sync word, preamble and power for a region. `ERROR_NOT_SUPPORTED` for an unsupported region |
+| `get_radio_profile(backend, region, modulation, preset, profile)` | The parameters for a region and modulation: frequency, bandwidth, spreading factor, coding rate, sync word, preamble and power for LoRa, or the `channel` and power for ESP-NOW. `ERROR_NOT_SUPPORTED` for an unsupported region, modulation or preset. Return it for `RADIO_MODULATION_ESPNOW` only when the protocol has an ESP-NOW transport |
 | `on_start(backend)` | The radio is on with the backend's profile, e.g. to send an advert |
 | `on_receive(backend, data, length, rssi, snr)` | A frame was received. Return `false` when it couldn't be read, so apps see it as `MESH_FRAME_UNREADABLE` |
 | `on_tick(backend)` | Called about once per second, for timers like adverts and acknowledgement timeouts |
 | `send_text(backend, seq, to, channel, text)` | Encode a message and transmit it with `mesh_host_transmit()`, passing `seq` along |
-| `get_channels`, `set_channel` | Optional channel support |
+| `get_channels`, `set_channel`, `remove_channel` | Optional channel support. The service never calls `remove_channel` for channel 0 |
+| `get_contact_uri(backend, contact, name, uri, size)` | Optional. A URI for a QR code of a contact, or of this node when `contact` is `NULL` |
+| `is_valid_contact_address(backend, address)` | Optional. Whether an address can belong to a contact, e.g. a public key of the right length |
+| `on_node_name_changed(backend)` | Optional. Announce the new name |
 
 The host functions report back to the service:
 
@@ -83,7 +86,17 @@ The host functions report back to the service:
 Guidelines:
 - Allocate the backend state and its containers in PSRAM: `tt::newObject()` and the `tt::std` containers (`TactilityCpp/`).
 - Every outgoing direct message that waits for an acknowledgement should end as `DELIVERED` or `FAILED`.
-- Add the module to `Tactility/CMakeLists.txt`, start it in `InitServices.cpp` under `TT_FEATURE_MESH`, and give it a test target in `Tests/CMakeLists.txt`.
+- Add the module to `Tactility/CMakeLists.txt`, start it in `InitServices.cpp`, and give it a test target in `Tests/CMakeLists.txt`.
+
+## Contacts and conversations
+
+The service keeps the contacts per backend in `contacts.bin` and adds a node when it sends a direct message. Backends only validate addresses and build URIs. The store tags each record with its channel and peer hash, so `mesh_conversation_get()` reads one conversation without scanning the text.
+
+## ESP-NOW
+
+The ESP-NOW radio device (`Tactility/Source/service/espnow/EspNowRadio.cpp`) wraps the ESP-NOW service, so mesh and the Chat app share one Wi-Fi setup. It supports `RADIO_MODULATION_ESPNOW`, broadcasts unencrypted frames, and selects the Wi-Fi channel with `RADIO_PARAMETER_CHANNEL`. A MeshCore frame travels as one ESP-NOW packet, up to the 250 byte limit of ESP-NOW v1.
+
+Transmissions count as sent once the Wi-Fi stack accepts them, as it reports no completion. The service doesn't apply a duty cycle to ESP-NOW. It estimates its airtime from the frame size.
 
 ## The store
 
@@ -98,9 +111,7 @@ Records are stored as plain text, and the node list isn't stored.
 
 ## Build inclusion
 
-Mesh is only built into firmware for devices that set `hardware.mesh=true` in `device.properties` (see [Device Properties](device-development/device-properties.md)). The build then defines `TT_FEATURE_MESH=1`, and every use of the mesh API in `Tactility` is inside `#if TT_FEATURE_MESH`. On other devices, nothing references the mesh modules, and the linker leaves them out.
-
-The simulator always builds mesh, with a `mock,radio` device that loops transmissions back to other mock radios.
+The mesh stack is built into the firmware of every device. It only starts when the user turns mesh on, and `mesh_is_available()` reports whether a radio exists. The simulator has a `mock,radio` device that loops transmissions back to other mock radios.
 
 ## Testing
 

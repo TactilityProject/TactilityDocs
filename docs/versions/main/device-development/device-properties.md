@@ -44,7 +44,6 @@ The device's full name is the vendor followed by the name. When the vendor is em
 - `hardware.spiRamSpeed`: the SPI RAM frequency (e.g. `80M`, `120M` or `200M`). Don't add spaces and always use an upper-case `M`. Required when `hardware.spiRam` is `true`.
 - `hardware.spiRamXipDisabled`: optional boolean for ESP32-S3 devices. Set it to `true` when the device fails to boot with "PSRAM space not enough for the Flash instructions". Code and read-only data then stay in flash instead of being copied to SPI RAM. Defaults to `false`.
 - `hardware.bluetooth`: optional boolean to enable Bluetooth (NimBLE). Defaults to `false`.
-- `hardware.mesh`: optional boolean to build [mesh networking](user-guide/mesh.md) into the firmware. Requires a LoRa radio in the devicetree, and SPI RAM. Defaults to `false`.
 - `hardware.usbHostEnabled`: optional boolean to enable USB host support (hubs, mass storage, etc.). Defaults to `false`.
 
 ### USB device
@@ -72,6 +71,7 @@ The display's shape (rounded corners or circular) isn't set here: the display dr
 ## lvgl
 
 - `lvgl.colorDepth`: required integer with the number of bits per pixel (e.g. `16`).
+- `lvgl.fsCacheSize`: optional integer with the size in bytes of the buffer that LVGL allocates on the first read of a file (default `4096`). Lower it on devices without PSRAM, where this allocation can fail when memory is low (e.g. `512`).
 - `lvgl.theme`: optional default theme mode: `DefaultDark`, `DefaultLight` or `Mono`. `Mono` starts in light mode. Defaults to `DefaultDark`. Users can change the theme in the Appearance settings.
 - `lvgl.fontSize`: optional default font size in pixels. Defaults to `14`.
 - `lvgl.dpi`: optional override for `display.dpi`. This changes the way LVGL scales its widgets.

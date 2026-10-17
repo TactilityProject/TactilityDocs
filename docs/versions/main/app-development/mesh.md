@@ -6,7 +6,7 @@ See [Mesh Networking](user-guide/mesh.md) for what the user sets up, and which d
 
 ## Availability
 
-The mesh API only exists in firmware for devices with mesh support. Check `MESH_API_VERSION` when your app depends on newer functions.
+The mesh API only exists in firmware for devices with mesh support. Check `MESH_API_VERSION` when your app depends on newer functions. Version 2 added contacts, conversations, channel removal, contact URIs, the node name and radio selection.
 
 Check the state before you send:
 
@@ -102,6 +102,8 @@ while (running) {
             case MESH_EVENT_STATE:    // event.state
             case MESH_EVENT_NODE:     // the node list changed
             case MESH_EVENT_FRAME:    // event.frame: an advert or an unreadable frame
+            case MESH_EVENT_CONTACT:  // a contact was added or removed
+            case MESH_EVENT_CHANNEL:  // a channel was added, replaced or removed
                 break;
         }
     }
@@ -115,11 +117,44 @@ task_event_group_destruct(&event_group);
 - `MESH_EVENT_FRAME` reports frames that aren't messages, and aren't stored: adverts (`MESH_FRAME_ADVERT`, with `frame.from` and `frame.name`) and frames that the protocol couldn't read (`MESH_FRAME_UNREADABLE`).
 - Subscribe before reading the history, so no message falls between the two. A message can then appear in both: skip duplicates by `seq`.
 
+## Conversations
+
+`mesh_conversation_get(peer, channel, before_seq, messages, max_count, &count)` reads one conversation, newest first. Pass a `MeshAddress` as `peer` for a direct conversation, or `NULL` and a channel index for a channel. It waits for the mesh service, like the history does.
+
+## Contacts
+
+Contacts are saved per backend and persisted. A node that sends a direct message is added automatically.
+
+```c
+MeshContact contacts[16];
+size_t count = 0;
+mesh_get_contacts(contacts, 16, &count);
+
+mesh_add_contact(&address, "Alice");  // NULL name: taken from the nodes that were heard
+mesh_remove_contact(&address);        // The stored messages remain
+```
+
+- `mesh_add_contact()` returns `ERROR_INVALID_ARGUMENT` when the backend doesn't accept the address, e.g. a public key of the wrong length. It also renames an existing contact.
+- `MESH_EVENT_CONTACT` is posted when a contact is added or removed.
+- `mesh_get_contact_uri(contact, uri, size)` returns a URI that other mesh apps scan as a QR code. Pass `NULL` for this node. It returns `ERROR_NOT_SUPPORTED` for a backend without one. Show it with the `lvgl_qr` widget (`<lvgl/widgets/qr.h>`), or start the QR Code app.
+
+## Node name
+
+`mesh_set_node_name()` and `mesh_get_node_name()` set and read the name this node announces. The default is `TactilityUser-` and 8 random lower case hexadecimal characters, generated once. A rename is announced again right away.
+
+## Radios
+
+`mesh_get_radio_count()` and `mesh_get_radio_name()` list the started radios that mesh can use: LoRa radios and ESP-NOW radios. `mesh_get_radio()` returns the radio in use and `mesh_set_radio()` selects one by name. The choice is persisted. A `NULL` or empty name selects the default: the first radio that isn't ESP-NOW, or the ESP-NOW radio when there is no other.
+
+Presets only apply to LoRa. `mesh_get_preset_count()` reports 0 presets while an ESP-NOW radio is in use. A backend that doesn't support the radio (Meshtastic on ESP-NOW) leaves the state at `MESH_STATE_ERROR`.
+
 ## Nodes and channels
 
 - `mesh_get_nodes()` returns the nodes heard since the protocol started, with their name, last signal and when they were last heard.
 - `mesh_get_channels()` returns the channels of the active protocol. A message's `channel` field is the channel's `index`.
-- `mesh_set_channel()` adds or replaces a channel. How the name and key combine depends on the protocol. For a MeshCore hashtag channel, pass a name like `#test` with `key_length` 0: the key is derived from the name.
+- `MESH_EVENT_CHANNEL` is posted when `mesh_set_channel()` or `mesh_remove_channel()` succeeds, from any app. Reload your channel list on it.
+- `mesh_remove_channel(index)` leaves a channel. Channel 0 can't be removed, and the stored messages remain.
+- `mesh_set_channel()` adds or replaces a channel. How the name and key combine depends on the protocol. For a MeshCore hashtag channel, pass a name like `#test` with `key_length` 0: the key is derived from the name. For a private channel, pass a 16 byte key.
 
 ## Raw frames
 

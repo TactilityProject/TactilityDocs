@@ -67,6 +67,7 @@ On devices with mesh networking support, `mesh` controls the mesh network, like 
 | `mesh preset [<name>]` | List the radio presets of the backend, or select one |
 | `mesh channels` | List the channels |
 | `mesh join <#channel>` | Join a hashtag channel, e.g. `mesh join #test` |
+| `mesh inspect [amount] [-f]` | Show the latest messages (20 by default, at most 200). With `-f` or `--follow` it keeps showing new messages and frames until you press Ctrl+C or `q` |
 
 The lists mark the current choice with `*`. The radio stays off until you set a region.
 

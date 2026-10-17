@@ -52,6 +52,15 @@ Use `lvgl_try_lock(timeout)` when you'd rather skip an update than wait. Keep th
 
 Remember that the widgets might not exist at that moment (see [Windows](#windows)), so check your stored pointers inside the lock.
 
+## No file operations on the LVGL thread
+
+Code that runs on the LVGL thread must not do file operations: `create_widgets`, LVGL event callbacks, timers, and anything that runs while you hold the LVGL lock. That includes reading or writing settings, and calls that do it for you.
+
+- A file read can block for a long time, especially on an SD card, and the whole UI freezes meanwhile.
+- `create_widgets` can run on another app's thread, when that app's window closes. Those threads can have small stacks, or stacks in external RAM that can't access flash.
+
+Do the file work in your app's own task, keep the result in your context, and make the widgets only show what's there. In a callback, signal your task with an event group bit and let it do the work. The same goes for other calls that wait on a service.
+
 ## Tactility widgets
 
 `lvgl-module` adds a few widgets on top of LVGL's own. The theme styles them, so they look consistent with the rest of the system.

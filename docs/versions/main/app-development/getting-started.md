@@ -62,7 +62,7 @@ or if you downloaded one of the example apps, you can build it from the app's fo
 ./tt app build --architecture esp32s3
 ```
 
-On Windows, use `tt` instead of `./tt`.
+On Windows, use `.\tt` in PowerShell, or `py tt.py` (see [The tt Tool](app-development/tt.md)).
 
 `tt` downloads the TactilitySDK version from the manifest's `target.sdk` automatically. It builds the app for every platform and creates the package in `build/<package id>.app`.
 
