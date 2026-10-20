@@ -23,6 +23,12 @@ Properties:
 - `timeFormat24h`: Determines the format of the time in the top bar. Supported values: "true" or "false". The default value is "true".
 - `dateFormat`: Determines how dates are displayed (e.g. "MM/DD/YYYY" or "DD/MM/YYYY").
 
+## Kernel
+
+Settings → Kernel lists the kernel modules that came from installed app packages (see [Modules in a Package](app-development/modules.md)), with their status under the name. The button next to a module starts or stops it. When a module can't be started or stopped, the reason shows in the status. A module that is in use by an app, or one that has a driver in use, can't be stopped.
+
+Modules that are part of the firmware aren't listed.
+
 ## Wi-Fi
 
 ## Wi-Fi Access Point Provisioning

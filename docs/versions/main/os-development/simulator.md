@@ -18,6 +18,30 @@ macOS simulator support is a work in progress.
 
 If you install WSL and Ubuntu, the simulator should work out-of-the-box.
 
+## Profiles
+
+The simulator can imitate different devices. Open the Simulator app (Settings -> Simulator), pick a profile with the list button and press Reboot to apply it. The simulator restarts itself with the new profile.
+
+A profile sets:
+- the resolution of the display, and whether it starts in portrait or landscape
+- the UI density (regular or compact)
+- whether the display is greyscale, which gives the monochrome theme
+- whether it has a keyboard and whether it has a pointer (mouse or touch)
+
+The Orientation section of the app overrides the profile's orientation: Default, Landscape or Portrait. The window changes shape when the display rotates. Picking a different profile sets the override back to Default.
+
+The selected profile and orientation are stored in `data/tactility/simulator_profile.txt`. Changing either one also changes the saved orientation of the Display settings: Landscape or Portrait is written there, and Default removes it, so that the profile's own orientation applies. The profiles are listed in `Devices/simulator/Source/SimulatorProfile.cpp`.
+
+## Mock hardware
+
+The simulator's devicetree (`Devices/simulator/simulator.dts`) has mock devices from `Drivers/mock-drivers-module`:
+
+| Compatible | Behaviour |
+|---|---|
+| `mock,wifi` | Wi-Fi with a fixed list of access points. Connecting always succeeds |
+| `mock,bluetooth` | Bluetooth with three nearby peers (a keyboard, a gamepad and a speaker). Scanning, pairing and connecting succeed instantly. Pairing is not stored |
+| `mock,radio` | A packet radio, e.g. LoRa. Mock radios in the same process with the same settings receive each other's transmissions |
+
 ## Building
 
 ## Building on Windows 11 (with WSL + Ubuntu)

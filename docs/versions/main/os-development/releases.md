@@ -22,7 +22,7 @@ The "Build Firmware" workflow (`.github/workflows/build.yml`) runs for pull requ
 
 So a release's SDKs come only from its tag, and later pushes to `main` can't overwrite them.
 
-Every SDK version on the CDN (`sdk/<version>/`) has the SDK of each platform and `tools.zip`, the tools that `tt` runs for that version. The CDN feeds the [Web Installer](user-guide/installing-firmware.md), and `tt` downloads the SDKs and tools from it.
+Every SDK version on the CDN (`sdk/<version>/`) has the SDK of each platform, `tools.zip` (the tools that `tt` runs for that version) and `new-project.zip` (the project that `tt` generates for a new app, with a `gui`, a `terminal` and a `module` variant). `index.json` lists them all. The CDN feeds the [Web Installer](user-guide/installing-firmware.md), and `tt` downloads the SDKs and tools from it.
 
 "Build Simulator" builds the simulator for Linux and macOS, and "Tests" runs the unit tests.
 

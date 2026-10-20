@@ -7,8 +7,8 @@ Read the [Kernel Concepts](kernel-concepts/driver.md) first for how [drivers](ke
 Existing drivers to use as a reference:
 - `Drivers/sx126x-module`: SX1262 (LoRa, FSK, LR-FHSS transmit only), built on RadioLib
 - `Drivers/cc1101-module`: CC1101 (FSK, 4-FSK, OOK), built on RadioLib
-- `Tactility/Source/service/espnow/EspNowRadio.cpp`: ESP-NOW (`RADIO_MODULATION_ESPNOW`) on top of the ESP-NOW service
-- `Drivers/mock-drivers-module` (`mock,radio`): an in-process radio for the simulator and tests
+- `Platforms/platform-esp32/source/drivers/espnow/`: ESP-NOW (`RADIO_MODULATION_ESPNOW`), added by the `platform-esp32` module on devices with Wi-Fi
+- `Drivers/mock-drivers-module` (`mock,radio`): an in-process radio for the simulator and tests. It supports every modulation, including LoRa
 
 ## The driver
 

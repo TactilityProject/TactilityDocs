@@ -32,7 +32,7 @@ Each suite is its own executable, registered in `Tests/CMakeLists.txt`:
 - `TactilityTests` — the `Tactility` layer itself
 - `CryptModuleTests` — `crypt-module`
 - `AppModuleTests` — `app-module`
-- `AppPosixModuleTests` — `app-posix-module`
+- `AppPosixModuleTests` — `app-posix-module`, including loading [modules from a package](app-development/modules.md) with a fixture module
 - `HttpModuleTests` — `http-module`
 
 ## SDK integration test
@@ -45,7 +45,7 @@ cd Tests/SdkIntegration
 TACTILITY_SDK_PATH=../../release python3 ../../tt.py app build -a posix-x86_64
 ```
 
-CI does the same for every ESP32 target and the simulator, with `tt.py`, so it also tests the tools.
+CI does the same for every ESP32 target and the simulator, with `tt.py`, so it also tests the tools. It also generates a new project from `Buildscripts/TactilitySDK/NewProject/` and builds it: a `gui`, a `terminal` and a `module` project on the simulator, and a `module` project on every ESP32 target. The ESP32 build catches a module whose entry point got lost, because the ELF is almost empty then.
 
 Run it after any change to `Buildscripts/TactilitySDK/`, `tactility_component_register()`, or what a released SDK bundles. A passing `ninja build-tests` doesn't catch a broken SDK release, since that's a completely separate packaging/consumption path.
 

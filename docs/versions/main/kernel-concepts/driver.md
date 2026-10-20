@@ -48,6 +48,8 @@ Fields that aren't used can be left out of the initializer, so they're `NULL`.
 
 A module becomes the owner of the drivers it registers when it starts. `driver_get_owner()` returns that module, or `NULL` for a driver that wasn't registered by a module.
 
+`driver_is_in_use()` tells if a device is bound to the driver. A device counts from the moment `driver_bind()` starts, so a driver is in use while `start_device` runs. A module with a driver in use can't be stopped: `module_stop()` returns `ERROR_RESOURCE_BUSY`. Unbind the devices first (see [Module](kernel-concepts/module.md?id=references)).
+
 ## Starting and stopping devices
 
 `start_device` is called when a device that uses this driver is started. It typically:

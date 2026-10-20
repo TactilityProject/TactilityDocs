@@ -42,7 +42,7 @@ HelloWorld/
   ```
 - `assets/` holds files that are packaged with the app (see [Assets](app-development/fundamentals.md?id=assets)).
 
-The easiest way to start a new app is to copy one of the examples and change its manifest.
+The easiest way to start a new app is to let `tt` generate one (see [Starting a new app](app-development/tt.md?id=starting-a-new-app)), or to copy one of the examples and change its manifest.
 
 ## Installing the tt tool
 
@@ -98,6 +98,12 @@ Install the app on your device as follows:
 ```
 
 The first time, `tt` shows the device's fingerprint and asks whether to trust it, and the device asks whether to accept your computer. See [Remote Access](user-guide/remote-access.md). The package contains the binaries for all of its platforms, so the device picks its own.
+
+To install a package that you already have, pass the file. This works outside of an app project too:
+
+```bash
+./tt app install my_app.app
+```
 
 Once the app is installed, you can start it remotely:
 

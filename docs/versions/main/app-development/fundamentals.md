@@ -23,10 +23,12 @@ It includes headers for `app-module`, `lvgl-module`, TactilityKernel and more. I
 
 Apps are usually distributed as a package: a file with an `.app` extension. This is a tar file that contains:
 - The package manifest (`manifest.properties`): metadata such as the package id, its version and the apps it contains (see [Manifest.properties](#manifestproperties))
-- The binaries, one per app and per target platform, under `bin/<platform>/<binary>.elf` (e.g. `bin/esp32s3/helloworld.elf`). Simulator builds use `.so` instead of `.elf`.
+- The binaries, one per app, per module and per target platform, under `bin/<platform>/<binary>.elf` (e.g. `bin/esp32s3/helloworld.elf`). Simulator builds use `.so` instead of `.elf`.
 - An optional `assets/` folder
 
 A package can contain more than one app. For example, a game and its settings app can be installed and updated together.
+
+A package can also contain kernel modules, for functionality that runs in the background and that apps can use. See [Modules in a Package](app-development/modules.md).
 
 App executables only contain the symbols defined by its own source files. All other symbols must be present in the main firmware **and** exposed explicitly by a kernel module's symbol table.
 
@@ -232,6 +234,14 @@ app.0.binary=helloworld
 - `requires.device.id`: optional comma-separated list of device ids (matching folder names under `Devices/`) this package is restricted to
 - `requires.ram`: optional minimum amount of RAM, in whole megabytes with an `M` suffix (e.g. `2M`)
 
+### Module properties
+
+A package can have modules (see [Modules in a Package](app-development/modules.md)). Each one has a `module.<index>.` property, numbered from `0` without gaps:
+
+- `module.<index>.binary`: required name of the module's binary, without extension. It's installed as `bin/<platform>/<binary>.elf`.
+
+A package needs at least one app or one module.
+
 ### App properties
 
 Each app in the package has an `app.<index>.` block, numbered from `0` without gaps:
@@ -244,7 +254,7 @@ Each app in the package has an `app.<index>.` block, numbered from `0` without g
 - `app.<index>.headless`: optional boolean for apps without a window. They can be started when no UI is available. Defaults to `false`.
 - `app.<index>.cleanup`: optional boolean that makes Tactility release what the app leaked when its `main()` returns: its tasks (after a grace period), open files and directories, and memory. It doesn't cover sockets, `dup()` or LVGL objects. Don't use it when the app hands memory, files or tasks over to the system, as they would be released twice. Defaults to `false`.
 
-In a package with more than one app, each app is built from its own subdirectory, named after its `app.<index>.binary`.
+In a package with more than one binary, each binary is built from its own subdirectory, named after its `app.<index>.binary` or `module.<index>.binary`.
 
 The older `0.2` manifest format, with a single app described by `app.id`, `app.name`, `app.version.name` and `app.version.code`, is still supported.
 

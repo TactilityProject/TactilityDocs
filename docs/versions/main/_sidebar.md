@@ -10,6 +10,7 @@
   - [Getting Started](app-development/getting-started.md)
   - [The tt Tool](app-development/tt.md)
   - [Fundamentals](app-development/fundamentals.md)
+  - [Modules in a Package](app-development/modules.md)
   - [UI](app-development/ui.md)
   - [Input and Focus](app-development/input.md)
   - [Input Devices](app-development/input-devices.md)

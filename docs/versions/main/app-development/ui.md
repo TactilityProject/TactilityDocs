@@ -99,6 +99,17 @@ lv_obj_t* button = lvgl_list_add_button(list, LV_SYMBOL_WIFI, "Home");
 lv_obj_add_event_cb(button, on_network_pressed, LV_EVENT_SHORT_CLICKED, ctx);
 ```
 
+Every item has a divider below it. When the list is in a card, the divider of the last item lies on the card's border. Call `lvgl_list_hide_last_divider()` after you added the last item:
+
+```c
+lv_obj_t* card = lvgl_card_create(parent);
+lv_obj_t* list = lvgl_list_create(card);
+/* ... add the items ... */
+lvgl_list_hide_last_divider(list);
+```
+
+It also works on a card that has the items as its direct children, without a separate list object.
+
 ### Chips
 
 Chips don't select themselves: give the selected one `LV_STATE_CHECKED`. Put a group of chips in a container with grid navigation, so the arrow keys move between the chips and up/down move to the next group (see [Input and Focus](app-development/input.md)):

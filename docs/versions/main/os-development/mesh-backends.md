@@ -94,9 +94,9 @@ The service keeps the contacts per backend in `contacts.bin` and adds a node whe
 
 ## ESP-NOW
 
-The ESP-NOW radio device (`Tactility/Source/service/espnow/EspNowRadio.cpp`) wraps the ESP-NOW service, so mesh and the Chat app share one Wi-Fi setup. It supports `RADIO_MODULATION_ESPNOW`, broadcasts unencrypted frames, and selects the Wi-Fi channel with `RADIO_PARAMETER_CHANNEL`. A MeshCore frame travels as one ESP-NOW packet, up to the 250 byte limit of ESP-NOW v1.
+The ESP-NOW radio device is a driver of `platform-esp32` (`Platforms/platform-esp32/source/drivers/espnow/`). It uses the native ESP-NOW API, or the esp_hosted bridge on boards with a Wi-Fi co-processor, and shares the Wi-Fi radio with the other Wi-Fi users. It supports `RADIO_MODULATION_ESPNOW`, broadcasts unencrypted frames, and selects the Wi-Fi channel with `RADIO_PARAMETER_CHANNEL`. A MeshCore frame travels as one ESP-NOW packet, up to the 250 byte limit of ESP-NOW v1.
 
-Transmissions count as sent once the Wi-Fi stack accepts them, as it reports no completion. The service doesn't apply a duty cycle to ESP-NOW. It estimates its airtime from the frame size.
+Transmissions count as sent once the Wi-Fi stack accepts them, as it reports no completion. Mesh doesn't apply a duty cycle to ESP-NOW. It estimates its airtime from the frame size.
 
 ## The store
 
@@ -111,7 +111,7 @@ Records are stored as plain text, and the node list isn't stored.
 
 ## Build inclusion
 
-The mesh stack is built into the firmware of every device. It only starts when the user turns mesh on, and `mesh_is_available()` reports whether a radio exists. The simulator has a `mock,radio` device that loops transmissions back to other mock radios.
+The mesh stack is built into the firmware of every device. It only starts when the user turns mesh on, and `mesh_is_available()` reports whether a radio exists. The simulator has a `mock,radio` device that delivers transmissions to other mock radios in the process.
 
 ## Testing
 

@@ -4,7 +4,7 @@ Apps can only call the functions that the firmware exports. This page explains h
 
 ## How symbols are exported
 
-Every [kernel module](kernel-concepts/module.md) can export symbols through the `symbols` field of its `struct Module`: a table of `ModuleSymbol` entries, terminated by `MODULE_SYMBOL_TERMINATOR`. When an app is loaded, its undefined symbols are looked up in the tables of the modules in the firmware.
+Every [kernel module](kernel-concepts/module.md) can export symbols through the `symbols` field of its `struct Module`: a table of `ModuleSymbol` entries, terminated by `MODULE_SYMBOL_TERMINATOR`. When an app is loaded, its undefined symbols are looked up in the tables of the modules that were added to the system with `module_add()`. A module doesn't need to be started for this. The [modules from a package](app-development/modules.md) are looked up the same way.
 
 ```c
 const struct ModuleSymbol lvgl_module_symbols[] = {
