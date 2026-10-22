@@ -12,7 +12,7 @@ Apps implement `tt::app::App` (or provide plain callbacks). Each app has an `App
 
 ## Service Framework
 
-Services implement `tt::service::Service` with a `ServiceManifest`. Services are long-running background processes: GUI, Wi-Fi, the app loader, the statusbar, GPS, the [WebServer](../features/webserver.md), and more.
+Services implement `tt::service::Service` with a `ServiceManifest`. Services are long-running background processes: GUI, Wi-Fi, the app loader, the statusbar, GPS, and more.
 
 ## Hardware Abstraction Layer
 

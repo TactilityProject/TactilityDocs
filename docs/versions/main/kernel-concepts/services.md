@@ -6,7 +6,6 @@ A service is a long-running part of the system that works in the background, ind
 |---|---|
 | `tactility.statusbar` | Updates the statusbar icons (Wi-Fi, battery, SD card, etc.) |
 | `development-server` | The development server (`development-module`): remote shell, file transfer, and installing and running apps over the network (see [Remote Access](user-guide/remote-access.md)) |
-| `tactility.webserver` | The web server for managing the device from a browser |
 | `tactility.audio` | Audio input and output, volume and mute |
 | `tactility.rtctime` | Keeps the system time in sync with a real-time clock |
 | `tactility.displayidle`, `tactility.keyboardidle` | Turn off the display and keyboard backlight after a period without activity |

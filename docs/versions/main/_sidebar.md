@@ -38,6 +38,7 @@
   - [Keyboard](driver-development/keyboard.md)
   - [Pointer](driver-development/pointer.md)
   - [Radio](driver-development/radio.md)
+  - [Wi-Fi](driver-development/wifi.md)
   - [SPI Controller](driver-development/spi-controller.md)
 - OS Development
   - [Project Structure](os-development/project-structure.md)
