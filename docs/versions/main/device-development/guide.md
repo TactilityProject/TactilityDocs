@@ -53,3 +53,16 @@ Drivers based on the `TactilityKernel` subproject. The drivers are found in `Pla
 
 Explore the [Kernel Concepts](kernel-concepts/driver.md) for how [drivers](kernel-concepts/driver.md), [devices](kernel-concepts/device.md) and [modules](kernel-concepts/module.md) work.
 
+
+## Overriding system assets
+
+The files in `Data/system/` are embedded in the firmware.
+A device can replace any of them by placing a file at the same relative path in `Devices/your-device-identifier/system/`.
+
+For example, to use a custom boot logo:
+
+```
+Devices/your-device-identifier/system/app/Boot/assets/logo.png
+```
+
+The boot app also has `logo_small.png`, `logo_large.png` and `logo_usb*.png` variants. Variants that aren't overridden use the default files.
