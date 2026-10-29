@@ -14,7 +14,7 @@ LoRa mesh networking requires a LoRa radio, so it's not available on all devices
 1. **Set your region.** A radio may only transmit on the frequencies and at the power that are allowed where you are. The setup wizard asks for your region on first boot. You can change it later in **Settings → Mesh → Region**. The radio stays off until a region is set.
 2. **Pick a mesh network.** In **Settings → Mesh → Mesh network**, choose MeshCore or Meshtastic. Choosing "Disabled" turns mesh networking off.
 3. **Pick a radio** (only when you have more than one). See [Radio](#radio).
-4. **Pick a preset** (MeshCore only, LoRa only). The preset sets the radio parameters, and must match the other nodes around you. "Default" is the standard setting of your region. "EU NL" is the setting of the Dutch community.
+4. **Pick a preset** (LoRa only). The preset sets the radio parameters, and must match the other nodes around you. Both mesh networks have their own card in the Mesh settings, which are always shown so you can set up a mesh network before you select it. See [Regions and presets](#regions-and-presets).
 
 Once a mesh network is selected and a region is set, the **Mesh** toggle in the system menu turns mesh networking on and off. While it's on, the status bar shows the mesh icon.
 
@@ -36,18 +36,42 @@ ESP-NOW is a Wi-Fi radio mode. For MeshCore, Tactility uses MeshCore's ESP-NOW s
 
 ## Regions and presets
 
+The **Region** is the legal limit for your radio: the frequencies and power that you may use. A preset sets the rest of the radio parameters. The settings of each mesh network are kept separately, and are remembered while another mesh network is selected.
+
+### MeshCore
+
+The **MeshCore** card in the Mesh settings has a **Selected preset**. Besides "Default", the list has the settings that the MeshCore community suggests for countries and regions, such as Australia, Netherlands, Netherlands (Limburg), EU/UK (Narrow), USA and Vietnam. "Default" is the standard setting of your region, for EU 868, US 915 and AU 915.
+
+- Selecting a preset also sets the **Region** to the one that the preset needs, e.g. "Netherlands" selects EU 868. If the current region already allows the preset, it stays.
+- Selecting a preset fills in the settings below it: frequency, bandwidth, spreading factor, coding rate, transmit power, path hash size and region scope. Turn on **Advanced settings** to see them and change them.
+- A change of one of these settings replaces the value of the preset. "Profile value" in the selection (or an empty frequency or scope) goes back to the value of the preset. Selecting another preset clears your changes.
+- **Frequency** is in MHz, e.g. `869.618`.
+- **Path hash size** is the number of bytes per hop in the path of a packet (1 to 3). The presets of the Netherlands use 2 bytes. Other MeshCore nodes on your network need to use a size that they accept.
+- **Region scope** limits flooded packets to a region, like the default scope in the MeshCore app. The presets of the Netherlands use `nl`. Enter `*` for no scope. Packets with a scope are only repeated by repeaters that know that region.
+- A setting is refused when it doesn't fit the region. That includes a frequency or bandwidth that leaves the band of the region, and a power above the limit of the band that holds the frequency.
+
+### Meshtastic
+
+The **Meshtastic** card has a **Modem preset**: LongFast (the default), LongModerate, LongSlow, MediumFast, MediumSlow, ShortFast, ShortSlow and ShortTurbo. Its frequency slot comes from the name of the primary channel within the band of your region, like other Meshtastic nodes do.
+
+- A preset that is wider than the band of your region can't be used, e.g. ShortTurbo in EU 868. The preset is refused, and the status shows "Settings not allowed in" and your region when settings stop the radio from starting.
+- A primary channel that you never changed is named after the selected modem preset, like other Meshtastic nodes do. A primary channel that you configured keeps its name, so it keeps its frequency slot.
+- Meshtastic uses the region that you set. It doesn't change it.
+
+### Regions that each mesh network supports
+
 | Mesh network | Regions |
 |---|---|
-| MeshCore | EU 868, US 915, AU 915 |
+| MeshCore | Any region that has a preset for it, such as EU 433, EU 868, US 915 and AU 915 |
 | Meshtastic | EU 433, EU 868, US 915, AU 915, NZ 865, IN 865, RU 868, CN 470, JP 920 |
 
-Meshtastic uses the LongFast preset, in the frequency slot that its primary channel's name selects, like other Meshtastic nodes do.
+### Transmit limits
 
-Tactility limits how much the radio transmits, to stay within the duty cycle of your region (e.g. 1% or 10% of an hour in Europe). Before it transmits, it checks whether the channel is free.
+Tactility limits how much the radio transmits, to stay within the duty cycle of your region (e.g. 1% or 10% of an hour in Europe). Before it transmits, it checks whether the channel is free. The transmit power is also limited to what the band of your channel allows.
 
 ## Channels
 
-Both mesh networks come with a public channel: "Public" for MeshCore, "LongFast" for Meshtastic.
+Both mesh networks come with a public channel: "Public" for MeshCore, "LongFast" for Meshtastic. You can leave the "Public" channel of MeshCore and join it again later. The primary channel of Meshtastic can't be left.
 
 ## Contacts and channels
 
@@ -64,11 +88,13 @@ Two apps cover chatting. Both open the same chat screen, and the settings icon i
 **Mesh Channels**
 
 The **+** button in the toolbar offers:
-- **Join public channel**: a hashtag channel such as `#test`. Its key comes from the name.
+- **Join public channel**: a hashtag channel such as `#test`. Its key comes from the name. To join MeshCore's "Public" channel again, enter `Public` without the `#`.
 - **Join private channel**: enter the name and the key in hexadecimal.
 - **Create private channel**: enter a name. Tactility makes a random key. Open the channel's chat and tap the info icon to see the key, so you can share it with people who should join.
 
-The remove icon in a channel's chat leaves the channel. The primary channel can't be left.
+The remove icon in a channel's chat leaves the channel. Meshtastic's primary channel can't be left: Tactility tells you so.
+
+A channel that you join or create gets the next free number, after the primary channel.
 
 **Chat**
 - Messages show their state: queued, sent, delivered (acknowledged direct messages), or failed (no acknowledgement in time). Channel messages stay "sent", as they aren't acknowledged.
@@ -95,4 +121,5 @@ Your node's identity (a MeshCore key pair, or a Meshtastic node number) is creat
 
 - Tactility is a chat node: it doesn't repeat messages for other nodes.
 - MeshCore: no direct routing (path learning), no repeater or room server requests and no multi-part messages.
-- Meshtastic: no public key encryption of direct messages, no other presets than LongFast, and no positions or telemetry.
+- MeshCore: only the default region scope is supported, not scopes per channel.
+- Meshtastic: no public key encryption of direct messages, and no positions or telemetry.

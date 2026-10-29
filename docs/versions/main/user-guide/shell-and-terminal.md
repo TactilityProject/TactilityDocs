@@ -64,7 +64,7 @@ On devices with mesh networking support, `mesh` controls the mesh network, like 
 | `mesh on`, `mesh off` | Turn mesh networking on or off |
 | `mesh backend [<id>]` | List the backends (e.g. `meshcore`, `meshtastic`), or select one |
 | `mesh region [<name>]` | List the radio regions (e.g. `EU_868`), or set yours |
-| `mesh preset [<name>]` | List the radio presets of the backend, or select one |
+| `mesh preset [<name>]` | List the radio presets of the backend, or select one. A preset that needs another region (e.g. `Netherlands` on a US radio) sets the region first |
 | `mesh channels` | List the channels |
 | `mesh join <#channel>` | Join a hashtag channel, e.g. `mesh join #test` |
 | `mesh inspect [amount] [-f]` | Show the latest messages (20 by default, at most 200). With `-f` or `--follow` it keeps showing new messages and frames until you press Ctrl+C or `q` |

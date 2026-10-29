@@ -6,7 +6,7 @@ See [Mesh Networking](user-guide/mesh.md) for what the user sets up, and which d
 
 ## Availability
 
-The mesh API only exists in firmware for devices with mesh support. Check `MESH_API_VERSION` when your app depends on newer functions. Version 2 added contacts, conversations, channel removal, contact URIs, the node name and radio selection.
+The mesh API only exists in firmware for devices with mesh support. Check `MESH_API_VERSION` when your app depends on newer functions. Version 2 added contacts, conversations, channel removal, contact URIs, the node name and radio selection. The preset functions take the id of a backend, and radio settings, network settings and `mesh_get_preset_region()` were added after that. Rebuild apps that use them.
 
 Check the state before you send:
 
@@ -28,7 +28,7 @@ if (mesh_get_state() != MESH_STATE_ON) {
 | `MESH_STATE_NO_BACKEND` | No mesh network is selected |
 | `MESH_STATE_ERROR` | The radio or the protocol failed to start |
 
-Settings like the enabled state, the protocol and the preset belong to the user. Apps can read them (`mesh_is_enabled()`, `mesh_get_backend()`, `mesh_get_preset()`), but should leave changing them to the Mesh settings.
+Settings like the enabled state, the protocol and the preset belong to the user. Apps can read them (`mesh_is_enabled()`, `mesh_get_backend()`, `mesh_get_preset()`), but should leave changing them to the Mesh settings. See [Presets and radio settings](#presets-and-radio-settings).
 
 ## Sending
 
@@ -148,12 +148,50 @@ mesh_remove_contact(&address);        // The stored messages remain
 
 Presets only apply to LoRa. `mesh_get_preset_count()` reports 0 presets while an ESP-NOW radio is in use. A backend that doesn't support the radio (Meshtastic on ESP-NOW) leaves the state at `MESH_STATE_ERROR`.
 
+## Presets and radio settings
+
+Presets and settings are kept per backend, so a backend can be configured before it is selected. The functions take the id of a backend (`"meshcore"`, `"meshtastic"`), or `NULL` for the selected backend.
+
+```c
+char name[MESH_NAME_MAX_LENGTH + 1];
+size_t count = mesh_get_preset_count("meshcore");
+for (size_t i = 0; i < count; i++) {
+    mesh_get_preset_name("meshcore", i, name, sizeof(name));
+}
+mesh_get_preset("meshcore", name, sizeof(name));  // The selected preset
+```
+
+**Selecting a preset**
+
+`mesh_set_preset(backend, name)` selects a preset, persists it, and clears the radio and network settings of that backend. It returns:
+
+- `ERROR_NOT_FOUND` when the backend has no such preset
+- `ERROR_NOT_SUPPORTED` when the region of the radio doesn't allow the preset, e.g. a bandwidth that is wider than its band. Nothing changes then
+
+A preset can need another region, e.g. the MeshCore preset "Netherlands" needs EU 868. `mesh_get_preset_region(backend, name, &region)` returns the region that the preset needs, or the current region when it fits already. Set the region first (`radio_settings_save_region()` or `settings::radio::saveRegion()`), and only then the preset, and stop when saving the region fails. `ERROR_NOT_SUPPORTED` means that no region allows the preset.
+
+**Radio settings**
+
+`struct MeshRadioSettings` has a frequency (Hz), bandwidth (Hz), spreading factor, coding rate (the denominator, 5 to 8) and power (dBm). A value of 0 uses the value of the preset.
+
+- `mesh_set_radio_settings(backend, &settings)` persists settings, and reconfigures the radio when the backend is selected and the service is running. It returns `ERROR_OUT_OF_RANGE` when the region doesn't allow the channel or the power. The channel (frequency and bandwidth) must lie in one band of the region, and the power can't be above the limit of that band. Nothing is stored then.
+- `mesh_get_radio_settings(backend, &settings)` returns what was set.
+- `mesh_get_radio_parameters(backend, &parameters)` returns what the radio runs with or would run with: the values of the preset with the settings applied. For a backend that is running it returns the values of the radio. For other backends the values come from the preset alone, which can differ when the backend's state selects the frequency, like the primary channel of Meshtastic. It returns `ERROR_INVALID_STATE` when the radio doesn't use LoRa or has no region.
+
+**Network settings**
+
+`struct MeshNetworkSettings` has a path hash size (bytes per hop in a path, 1 to `MESH_PATH_HASH_SIZE_MAX`) and the name of a region scope. A backend ignores the ones it doesn't have.
+
+- `mesh_set_network_settings(backend, &settings)` returns `ERROR_INVALID_ARGUMENT` for a path hash size outside the range. A path hash size of 0 and an empty scope use the value of the preset. `MESH_REGION_SCOPE_NONE` (`"*"`) turns the scope off.
+- `mesh_get_network_settings()` returns what was set, and `mesh_get_network_parameters()` returns what the backend runs with: the preset's values with the settings applied. The scope is empty for none.
+
+Settings are persisted before they are used, so a setter that fails to save leaves the radio and the network as they were.
 ## Nodes and channels
 
 - `mesh_get_nodes()` returns the nodes heard since the protocol started, with their name, last signal and when they were last heard.
 - `mesh_get_channels()` returns the channels of the active protocol. A message's `channel` field is the channel's `index`.
 - `MESH_EVENT_CHANNEL` is posted when `mesh_set_channel()` or `mesh_remove_channel()` succeeds, from any app. Reload your channel list on it.
-- `mesh_remove_channel(index)` leaves a channel. Channel 0 can't be removed, and the stored messages remain.
+- `mesh_remove_channel(index)` leaves a channel. The stored messages remain. A backend can refuse to remove a channel it can't do without: Meshtastic's primary channel (0) returns `ERROR_INVALID_ARGUMENT`. MeshCore's "Public" channel can be removed. Add it again with `mesh_set_channel()`, the name `Public` and `key_length` 0.
 - `mesh_set_channel()` adds or replaces a channel. How the name and key combine depends on the protocol. For a MeshCore hashtag channel, pass a name like `#test` with `key_length` 0: the key is derived from the name. For a private channel, pass a 16 byte key.
 
 ## Raw frames
