@@ -115,6 +115,8 @@ The `mesh inspect` command in the [Terminal](user-guide/shell-and-terminal.md) s
 
 Messages are stored on your device's user data storage, so they survive a reboot. When the storage budget is full, the oldest messages are removed.
 
+MeshCore and Meshtastic each have their own messages, contacts and channels. When you select the other mesh network, you only see its data, and the data of the first one is there again when you switch back. Messages and contacts from before this separation are moved to the mesh network that they belong to.
+
 Your node's identity (a MeshCore key pair, or a Meshtastic node number) is created on first use, and stored there too.
 
 ## Limitations

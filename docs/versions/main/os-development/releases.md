@@ -22,7 +22,7 @@ The "Build Firmware" workflow (`.github/workflows/build.yml`) runs for pull requ
 
 So a release's SDKs come only from its tag, and later pushes to `main` can't overwrite them.
 
-Every SDK version on the CDN (`sdk/<version>/`) has the SDK of each platform, `tools.zip` (the tools that `tt` runs for that version) and `new-project.zip` (the project that `tt` generates for a new app, with a `gui`, a `terminal` and a `module` variant). `index.json` lists them all. The CDN feeds the [Web Installer](user-guide/installing-firmware.md), and `tt` downloads the SDKs and tools from it.
+Every SDK version on the CDN (`sdk/<version>/`) has the SDK of each platform, and `tools.zip` (the tools that `tt` runs for that version, with the project templates of `tt app create` in `NewProject/`: a `gui`, a `terminal` and a `module` variant). `index.json` lists them all. The CDN feeds the [Web Installer](user-guide/installing-firmware.md), and `tt` downloads the SDKs and tools from it.
 
 "Build Simulator" builds the simulator for Linux and macOS, and "Tests" runs the unit tests.
 
@@ -46,7 +46,7 @@ The `Buildscripts/` folder has scripts to package local builds:
 | `release.sh <device-id>` | Copies the current firmware build (`build/`) into `release/Tactility-<device-id>`, with the flash scripts, and the `.elf` files with debug symbols into `release/Tactility-<device-id>-symbols` |
 | `release-current.py` | Builds the TactilitySDK for the current build and exports the tools, into `release/sdk/<version>/` (see [Building TactilitySDK locally](app-development/symbols.md?id=building-tactilitysdk-locally)) |
 | `release-sdk-current.py` | Only builds the TactilitySDK for the current build |
-| `release-tools-current.py` | Only exports the tools that `tt` runs, into `release/sdk/<version>/tools` |
+| `release-tools-current.py` | Only exports the tools that `tt` runs, with `NewProject/`, into `release/sdk/<version>/tools` |
 | `release-tt.py` | Creates `tt.zip` and `tt.json` for the CDN in `release/tt/` |
 | `release-simulator.sh <build-dir> <target>` | Packages a simulator build with its `Data/` folders |
 

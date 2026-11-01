@@ -75,7 +75,8 @@ The display's shape (rounded corners or circular) isn't set here: the display dr
 - `lvgl.theme`: optional default theme mode: `DefaultDark`, `DefaultLight` or `Mono`. `Mono` starts in light mode. Defaults to `DefaultDark`. Users can change the theme in the Appearance settings.
 - `lvgl.fontSize`: optional default font size in pixels. Defaults to `14`.
 - `lvgl.dpi`: optional override for `display.dpi`. This changes the way LVGL scales its widgets.
-- `lvgl.uiDensity`: optional, decides how closely the widgets are put together: `default` or `compact`. Defaults to `default`.
+- `lvgl.uiSpacing`: optional, default spacing of the widgets in percent, from `0` (compact) to `100` (regular). Users can change it in the Appearance app. Defaults to `100`.
+- `lvgl.uiSize`: optional, default size of the widgets in percent, from `0` (compact) to `100` (regular). Users can change it in the Appearance app. Defaults to `100`.
 
 ## touch
 

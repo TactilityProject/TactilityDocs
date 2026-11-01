@@ -105,7 +105,7 @@ The settings of the service are in `settings.properties` in its user data folder
 
 ## Contacts and conversations
 
-The service keeps the contacts per backend in `contacts.bin` and adds a node when it sends a direct message. Backends only validate addresses and build URIs. The store tags each record with its channel and peer hash, so `mesh_conversation_get()` reads one conversation without scanning the text.
+The service keeps the contacts of each backend in `backends/<id>/contacts.bin` and adds a node when it sends a direct message. Backends only validate addresses and build URIs. The store tags each record with its channel and peer hash, so `mesh_conversation_get()` reads one conversation without scanning the text.
 
 ## ESP-NOW
 
@@ -115,7 +115,11 @@ Transmissions count as sent once the Wi-Fi stack accepts them, as it reports no 
 
 ## The store
 
-Messages are stored in `mesh-module`'s data folder as an append-only log:
+Every backend has its own messages and contacts, in its own folder `backends/<id>/` of the service's data folder (next to the files that the backend keeps itself, like its identity and channels). Only the storage of the selected backend is open, so a backend never sees the data of another one. The service opens it when the backend is selected, also while the radio is off, and closes the previous one. Messages that waited for a backend to come back (`MESH_DELIVERY_BLOCKED`) stay in its own store.
+
+Earlier versions kept one `store/` and one `contacts.bin` for all backends, with the backend in each record. At the first start the service moves those records to the folder of their backend and removes the shared files, and keeps them when something went wrong, to try again at the next start.
+
+The messages of a backend are stored in `backends/<id>/store` as an append-only log:
 
 - Records are buffered in RAM (PSRAM when available, 8 kB) and flushed every 30 seconds, or when the buffer is mostly full.
 - The log is split into segments of 32 kB. The oldest segment is deleted when there are more than 16.

@@ -40,8 +40,11 @@ The computer stores what it trusts in the `.tactility` folder in your home folde
 
 The first connection to a device shows the device's fingerprint and asks whether to continue. Compare it with the fingerprint in the device's Development app. When a device's fingerprint changes later (e.g. after it was reset), the connection is refused. Remove its line from `known_hosts` to trust it again.
 
+`tt` might also create a `.tactility` folder in the folder where you run it. It remembers the device's host address and the SDK version there.
+
 ## Details
 
 - The server listens on TCP port **6667**.
 - At most 3 sessions are active at the same time, and at most 1 of them is a remote shell.
+- Anyone on the network can ask for the device's manufacturer, name, id and Tactility version, without a certificate or approval. `tt host` and `tt` use this to select the SDK version.
 - The protocol is described in the [development module's README](https://github.com/TactilityProject/Tactility/tree/main/Modules/development-module).

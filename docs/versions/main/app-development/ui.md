@@ -178,7 +178,7 @@ lv_obj_add_event_cb(group, on_group_pressed, LV_EVENT_SHORT_CLICKED, ctx);
 Tactility runs on displays from 135×240 to 1280×720 pixels, in portrait and landscape. Make your layout adapt to the screen instead of using fixed positions and sizes:
 - Use LVGL's flex layout (`lv_obj_set_flex_flow()`, `lv_obj_set_flex_grow()`) and percentages (`LV_PCT(100)`).
 - Size things relative to the font size (e.g. `lvgl_get_text_font_height(FONT_SIZE_DEFAULT)`) instead of in pixels.
-- Check `lvgl_get_ui_density()`: `LVGL_UI_DENSITY_COMPACT` devices have small screens and need tighter layouts.
+- Use `lvgl_theme_get_spacing()` and `lvgl_theme_get_size()` (`<lvgl/theme.h>`) for custom paddings and sizes. They range from 0 (compact) to 100 (regular), and users set them in the Appearance app. `lvgl_theme_lerp(compact, regular, percent)` interpolates between the two values.
 - On round or rounded displays, use the [Insets](app-development/insets.md) API for content near the edges.
 
 ## Fonts and icons
