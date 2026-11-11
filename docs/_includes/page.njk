@@ -1,0 +1,63 @@
+---
+layout: base
+---
+{%- if version %}
+{%- set headings = content | headings %}
+{%- set around = version | neighbours(page.url) %}
+<div class="wrap wrap-docs docs{% if headings.length > 1 %} has-toc{% endif %}">
+  <aside class="sidebar">
+    <button class="sidebar-toggle" type="button" aria-controls="doc-nav" aria-expanded="false" hidden>Pages in {{ version.id }}</button>
+    <div id="doc-nav" class="sidebar-body">
+      <details class="version-picker">
+        <summary><span>Version</span> <strong>{{ version.id }}</strong></summary>
+        <ul>
+          {%- for other in versions %}
+          <li><a href="{{ page.inputPath | inVersion(other) }}"{% if other.id == version.id %} aria-current="true"{% endif %}>{{ other.id }}{% if other.development %} <small>development</small>{% elif other.latest %} <small>latest release</small>{% endif %}</a></li>
+          {%- endfor %}
+        </ul>
+      </details>
+      <nav aria-label="Documentation">
+        {%- for section in version.sections %}
+        {%- if section.title %}<p>{{ section.title }}</p>{% endif %}
+        <ul>
+          {%- for item in section.items %}
+          <li><a href="{{ item.url }}"{% if item.url == page.url %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+          {%- endfor %}
+        </ul>
+        {%- endfor %}
+      </nav>
+    </div>
+  </aside>
+  <article class="prose" data-pagefind-body data-pagefind-filter="version:{{ version.id }}">
+    {%- if not version.development and not version.latest %}
+    {%- set newest = versions | first %}
+    <p class="version-note" data-pagefind-ignore>This page is about Tactility {{ version.id }}, an old release. <a href="{{ page.inputPath | inVersion(newest) }}">Go to the {{ newest.id }} documentation</a>.</p>
+    {%- endif %}
+    {%- if title %}<h1>{{ title }}</h1>{% endif %}
+    {{ content | safe }}
+    {%- if around.previous or around.next %}
+    <nav class="pager" aria-label="Previous and next page" data-pagefind-ignore>
+      {%- if around.previous %}<a class="pager-previous" href="{{ around.previous.url }}"><small>Previous</small>{{ around.previous.label }}</a>{% endif %}
+      {%- if around.next %}<a class="pager-next" href="{{ around.next.url }}"><small>Next</small>{{ around.next.label }}</a>{% endif %}
+    </nav>
+    {%- endif %}
+  </article>
+  {%- if headings.length > 1 %}
+  <aside class="toc" aria-label="On this page">
+    <p>On this page</p>
+    <ul>
+      {%- for heading in headings %}
+      <li{% if heading.level == 3 %} class="toc-sub"{% endif %}><a href="#{{ heading.id }}">{{ heading.text | safe }}</a></li>
+      {%- endfor %}
+    </ul>
+  </aside>
+  {%- endif %}
+</div>
+{%- else %}
+<div class="wrap page">
+  <article class="prose">
+    {%- if title %}<h1>{{ title }}</h1>{% endif %}
+    {{ content | safe }}
+  </article>
+</div>
+{%- endif %}
