@@ -7,10 +7,10 @@ Tactility mounts its storage under a few paths:
 | Path | Contents |
 |---|---|
 | `/system` | Read-only system files (fonts, built-in assets). Part of the firmware. |
-| `/data` | The internal data partition, on devices without an SD card |
+| `/data` | The internal data partition, on devices that keep their user data in internal flash |
 | `/sdcard` | The SD card, when the device has one |
 
-Each device stores its user data either on the SD card or in the internal data partition (its `storage.userDataLocation` setting). Don't hardcode `/sdcard` or `/data`: use the path functions below, which pick the right one.
+Each device stores its user data at one mount path, such as `/sdcard` or `/data` (its `storage.path` setting). Don't hardcode `/sdcard` or `/data`: use the path functions below, which pick the right one.
 
 User data (settings, installed apps, app data) is kept in a `tactility/` folder on that storage, so it survives firmware updates.
 

@@ -83,6 +83,22 @@ The storage is mounted at `/sdcard` (SD card), `/data` (internal storage) and `/
 - Run a command line with `sh -c "<command>"`, e.g. `sh -c "ls | wc"`.
 - Run an app binary directly by its path, e.g. `/sdcard/tools/hello.elf`.
 
+### Boot scripts
+
+Tactility runs shell scripts at boot. Put them in the `boot` folder of the user data folder: `/sdcard/tactility/boot/` or `/data/tactility/boot/` (see [Configuration](user-guide/configuration.md)). Without that folder, nothing runs.
+
+- Every file that ends in `.sh` runs, one after the other, in alphabetical order. Prefix the names with numbers to control the order, e.g. `10-wifi.sh` and `20-mesh.sh`.
+- Each script runs with `sh`, like `sh script.sh`, so it can use the [shell commands](#commands) such as `wifi` and `mesh`.
+- The scripts run once the apps are registered, before the Launcher shows. Booting continues when the last script has ended, so a script that never ends keeps the device from booting.
+- The output of a script (standard output and errors) isn't shown on the screen. It's written to the log, one line per output line, e.g. `[10-wifi.sh] connected`. The log is on the serial monitor.
+- A script has no input, and its exit code is ignored. When a script fails, the next one still runs.
+
+Example `/sdcard/tactility/boot/10-wifi.sh`:
+
+```sh
+wifi connect -s MyNetwork -p secret
+```
+
 ## Remote shell
 
 You can also use the shell from a computer on the same network, with the [tt tool](app-development/tt.md):

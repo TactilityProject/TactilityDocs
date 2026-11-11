@@ -43,6 +43,6 @@ idf.py build flash monitor
 
 ## After installing
 
-On the first start, Tactility runs its setup. Devices with an SD card store their data on it, so insert one before you start (see the device's `storage.userDataLocation` in its [device properties](device-development/device-properties.md)).
+On the first start, Tactility runs its setup. Devices with an SD card store their data on it, so insert one before you start (see the device's `storage.path` in its [device properties](device-development/device-properties.md)).
 
 To install apps from your computer, connect the device to Wi-Fi and turn on the development server in Settings → Development (see [Remote Access](user-guide/remote-access.md)).

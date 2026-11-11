@@ -7,22 +7,27 @@ The kernel keeps a list of filesystems (`<tactility/filesystem/file_system.h>`):
 | Name | Path | Registered by |
 |---|---|---|
 | `system` | `/system` | The ESP32 platform: the read-only system partition |
-| `data` | `/data` | The ESP32 platform: the internal data partition |
+| `data` | `/data` | The `esp32_flash_fatfs` driver: the internal data partition |
 | `sdcard` | `/sdcard` | SD card drivers (`esp32_sdspi`, `esp32_sdmmc`), when a card is mounted |
 
 On the simulator, the POSIX platform registers folders on your computer instead: `system` and `data` (the `Data/system` and `Data/data` folders of the repository), and `root` for your computer's `/`.
+
+The `esp32_flash_fatfs` driver (`espressif,esp32-flash-fatfs`) mounts a wear-levelled FAT partition of the internal flash. Its devicetree node sets `partition-label` (the partition in the partition table) and `mount-path`. Other storage, like SPI NAND flash, is added the same way by its own driver.
 
 The internal partitions and SD cards use FAT. Files are accessed with the regular C and POSIX functions (`fopen()`, `stat()`, `opendir()`, etc.), through ESP-IDF's virtual filesystem.
 
 ## The data root
 
-User data (settings, installed apps, app data) is stored on the device's data root: the SD card or the internal data partition, depending on the device's `storage.userDataLocation` property. Use `<tactility/paths.h>` to find it instead of hardcoding a path:
+User data (settings, installed apps, app data) is stored on the device's root path: the mount path set by the device's `storage.path` property (e.g. `/sdcard` or `/data`), which is available as `CONFIG_TT_ROOT_PATH`. Use `<tactility/paths.h>` to find it instead of hardcoding a path:
 
-- `paths_get_data_root_path()`: the root of the storage (e.g. `/sdcard`)
+- `paths_get_root_path()`: the root of the storage (e.g. `/sdcard`)
+- `paths_is_root_mounted()`: whether the storage is currently mounted
 - `paths_get_data_path()`: Tactility's folder on it (`<root>/tactility`), which survives OS updates
 - `paths_get_temp_path()`: a folder for temporary files
 
-They return `ERROR_NOT_FOUND` when the storage isn't available, e.g. when the SD card isn't inserted.
+The path functions don't check the storage: they return the path even when the SD card isn't inserted. Check `paths_is_root_mounted()` first when that matters. Boot shows a message when the storage isn't mounted.
+
+`paths_get_data_root_path()` and `paths_is_data_root_mounted()` are deprecated aliases of the functions above.
 
 Apps use `<app/paths.h>` instead, which gives each app its own folders (see [Storage and Settings](app-development/storage.md)).
 

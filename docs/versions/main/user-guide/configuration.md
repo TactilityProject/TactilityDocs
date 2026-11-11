@@ -1,12 +1,12 @@
 # Configuration
 
-User data files are stored on either `/sdcard/tactility/` or `/data/tactility/`.
+User data files are stored in a `tactility/` folder on the device's storage path, usually `/sdcard/tactility/` or `/data/tactility/`.
 
-The `/data` partition is only present on devices that don't have an SD card slot. Devices with an SD card slot must have an SD card present when booting. 
+The `/data` partition is only used on devices that don't keep their data on an SD card. Devices that use an SD card must have one present when booting. 
 
 ## Boot
 
-During the boot process, the system tries to load `/{user_data}/settings/boot.properties`. `{user_data}` resolves to either the SD card or internal storage, depending on the device's `storage.userDataLocation` setting (see [Device Properties](device-development/device-properties.md)). When the file is missing, or doesn't override a property, the system defaults are used.
+During the boot process, the system tries to load `/{user_data}/settings/boot.properties`. `{user_data}` resolves to the device's storage path (e.g. the SD card or internal storage), set by its `storage.path` property (see [Device Properties](device-development/device-properties.md)). When the file is missing, or doesn't override a property, the system defaults are used.
 
 Properties:
 - `launcherAppId`: The application identifier for the launcher app. This parameter is required. The default is "Launcher".

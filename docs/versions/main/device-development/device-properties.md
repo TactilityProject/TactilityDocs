@@ -57,7 +57,9 @@ The USB device classes are enabled separately. They're all optional booleans tha
 
 ## storage
 
-- `storage.userDataLocation`: required location of the user data: `SD` or `Internal`.
+- `storage.path`: the mount path of the storage that holds the user data, e.g. `/data` for the internal data partition or `/sdcard` for an SD card. Defaults to `/sdcard` or `/data` when the older `storage.userDataLocation` (`SD` or `Internal`) is set instead.
+
+The device's `.dts` file must provide the storage at that path. For `/data` it needs an `espressif,esp32-flash-fatfs` node with `partition-label = "data"` and `mount-path = "/data"`. Any other path is provided by the driver of the storage, such as an SD card. See [Filesystems](kernel-concepts/filesystems.md).
 
 ## display
 
