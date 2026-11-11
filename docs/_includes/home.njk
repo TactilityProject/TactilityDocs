@@ -1,0 +1,34 @@
+---
+layout: base
+home: true
+---
+<section class="hero">
+  <div class="wrap">
+    <h1>{{ tagline }}</h1>
+    <p class="lead">{{ lead }}</p>
+  </div>
+</section>
+
+<section class="wrap versions" id="versions">
+  <h2>Choose a version</h2>
+  <div class="version-cards">
+    {%- for version in versions %}{% if version.development or version.latest %}
+    <a class="card" href="{{ version.url }}">
+      <h3>{{ version.id }} <span class="badge {% if version.development %}badge-warn{% else %}badge-yes{% endif %}">{% if version.development %}Development{% else %}Latest release{% endif %}</span></h3>
+      <p>{% if version.development %}{{ developmentText }}{% else %}{{ latestText }}{% endif %}</p>
+    </a>
+    {%- endif %}{% endfor %}
+  </div>
+  <h3>Older releases</h3>
+  <ul class="version-list">
+    {%- for version in versions %}{% if not version.development and not version.latest %}
+    <li><a href="{{ version.url }}">{{ version.id }}</a></li>
+    {%- endif %}{% endfor %}
+  </ul>
+</section>
+
+{%- if content | trim %}
+<section class="wrap home-body prose">
+  {{ content | safe }}
+</section>
+{%- endif %}

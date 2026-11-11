@@ -1,0 +1,13 @@
+{
+  "name": "Tactility Docs",
+  "tagline": "Documentation for the Tactility operating system",
+  "description": "Documentation for Tactility, an operating system for ESP32 devices: using it, developing apps, adding devices and drivers, and working on the OS itself.",
+  "url": "https://docs.tactilityproject.org",
+  "website": "https://tactilityproject.org",
+  "repo": "https://github.com/TactilityProject",
+  "community": [
+    { "name": "Matrix", "url": "https://matrix.to/#/#tactility:matrix.org" },
+    { "name": "Stoat", "url": "https://stt.gg/xwRTZEpX" },
+    { "name": "Discord", "url": "https://discord.gg/pXs2xGS6fs" }
+  ]
+}

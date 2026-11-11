@@ -1,0 +1,12 @@
+{
+  "main": [
+    { "label": "Support", "url": "/support/" },
+    { "label": "Website", "url": "https://tactilityproject.org", "external": true }
+  ],
+  "footer": [
+    { "label": "Licenses & Copyrights", "url": "/licenses-and-copyrights/" },
+    { "label": "Support", "url": "/support/" },
+    { "label": "Tactility website", "url": "https://tactilityproject.org" },
+    { "label": "GitHub", "url": "https://github.com/TactilityProject" }
+  ]
+}
