@@ -10,8 +10,19 @@ A keyboard driver is a `Driver` with `device_type = &KEYBOARD_TYPE` and an `api`
 
 | Function | Purpose |
 |---|---|
+| `capabilities` | Bit mask of `KeyboardCapability` flags (see [Capabilities](#capabilities)) |
 | `read_key(device, data)` | Returns the next pending key event, or a key of `0` when nothing is pending |
 | `get_backlight(device, backlight)` | Optional: the keyboard's backlight device |
+
+## Capabilities
+
+`capabilities` describes the keyboard. Set it explicitly in every `KeyboardApi`, `0` when none apply.
+
+| Capability | Meaning |
+|---|---|
+| `KEYBOARD_CAPABILITY_RESTRICTED` | A limited keyboard: buttons, a D-pad, an encoder or a trackball. It doesn't count as a hardware keyboard, so the software keyboard stays available |
+
+Use `keyboard_has_capability(device, KEYBOARD_CAPABILITY_RESTRICTED)` to check it.
 
 ## Key events
 
@@ -58,11 +69,10 @@ Either way, other parts of the system can receive the events through `keyboard_s
 
 Keyboards that can be connected and disconnected (e.g. a detachable keyboard) should implement the driver's `probe` function, which reports whether the hardware is present. The kernel then starts and stops the device automatically, and the LVGL bridge adds and removes it.
 
-The older `KeyboardApi::is_present` function is deprecated in favor of `probe`.
-
 ## Checklist
 
 - `device_type` is `&KEYBOARD_TYPE`.
+- `capabilities` is set, with `KEYBOARD_CAPABILITY_RESTRICTED` for button, D-pad, encoder and trackball keyboards.
 - Keys are Unicode codepoints, with the layout, Shift and Caps Lock applied.
 - Four-way devices send arrow keys, step-only devices send `CODEPOINT_FOCUS_NEXT`/`PREVIOUS`.
 - Every press has a matching release.

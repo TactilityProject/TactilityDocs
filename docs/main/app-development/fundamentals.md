@@ -25,6 +25,7 @@ Apps are usually distributed as a package: a file with an `.app` extension. This
 - The package manifest (`manifest.properties`): metadata such as the package id, its version and the apps it contains (see [Manifest.properties](#manifestproperties))
 - The binaries, one per app, per module and per target platform, under `bin/<platform>/<binary>.elf` (e.g. `bin/esp32s3/helloworld.elf`). Simulator builds use `.so` instead of `.elf`.
 - An optional `assets/` folder
+- An optional icon for the launcher: `icon.svg` and `icon_mono.svg` (see [Icons](#icons))
 
 A package can contain more than one app. For example, a game and its settings app can be installed and updated together.
 
@@ -358,6 +359,34 @@ if (event.type == APP_EVENT_RESULT) {
 ```
 
 Call `app_stream_unsubscribe()` exactly once, regardless of the result - on a non-`Ok` result there's nothing to read, but the stream still needs releasing.
+
+## Icons
+
+A package can have an icon that the launcher shows in the Apps tab. Put the SVG files next to `manifest.properties` in the project root:
+
+```
+HelloWorld/
+├── manifest.properties
+├── icon.svg          (optional, colour icon)
+├── icon_mono.svg     (optional, single colour icon for monochrome displays)
+└── ...
+```
+
+`tt app build` copies them to the root of the `.app` package. Nothing in `manifest.properties` refers to them: they are found by name.
+
+- `icon.svg` is the colour icon. It keeps its own colours.
+- `icon_mono.svg` is for monochrome displays and the monochrome theme. Only its shape counts: the launcher paints it in the theme's icon colour and keeps its transparency, so draw it in a single colour on a transparent background. Don't add a background tile: it would turn into one solid block.
+
+The launcher picks the variant that matches the theme, and uses the other one when that file is missing or can't be read. A colour icon on a monochrome theme isn't tinted. A mono icon on a colour theme is painted in the theme's icon colour. Without either file, the app gets the default icon.
+
+Some things to know:
+- The icon is one picture for the whole package, so all the apps in a package share it.
+- It's scaled to fit a square, with the aspect ratio kept and centered. Draw it on a square canvas (e.g. `viewBox="0 0 96 96"`).
+- Paths, basic shapes, strokes, transforms and gradients work. Text, filters and masks don't. Convert text to paths in your drawing tool.
+- Keep the file small. It is parsed when the launcher starts, and the result is kept in memory.
+- A newly installed or removed package updates the launcher without a restart.
+
+The [Material Symbols](https://fonts.google.com/icons) icons are a good source for single colour icons. Download them as SVG.
 
 ## Assets
 

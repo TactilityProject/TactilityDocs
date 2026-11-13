@@ -112,6 +112,17 @@ The LVGL bridge in `lvgl-module` (`source/devices/devices.cpp`, `source/devices/
 - **Frame buffers:** panels that expose their own frame buffers (`get_frame_buffer()`, `get_frame_buffer_count()`) are rendered into directly, when rotation is done in hardware.
 - **Rotation:** with `CAP_SWAP_XY` and `CAP_MIRROR`, a rotation becomes `swap_xy()` and `mirror()` calls relative to the devicetree's base orientation. Otherwise the pixels are rotated in software.
 
+### Display hook
+
+The kernel's display functions (`display_draw_bitmap()`, `display_swap_xy()`, `display_mirror()`, ...) can notify one observer. A module registers a `DisplayHook` with `display_set_hook()` and clears it with `display_set_hook(NULL)`. The [remote display session](../user-guide/remote-access.md#viewing-the-display) uses it to copy everything that is drawn, also when LVGL isn't involved.
+
+| Callback | Called |
+|---|---|
+| `on_draw_bitmap` | Before the driver's `draw_bitmap()`, so a pointer into a frame buffer is still valid |
+| `on_swap_xy`, `on_mirror`, `on_set_gap`, `on_invert_color`, `on_disp_on_off`, `on_clear`, `on_refresh` | After the driver's function, whatever its result |
+
+Every callback gets the display `Device*` first and returns nothing. Members can be `NULL`. Callbacks run on the drawing task, so they must be fast and must not block. The `DisplayHook` itself must stay valid (static storage), and a callback can still run while the hook is being cleared.
+
 ### Shared SPI buses
 
 A panel on a shared SPI bus (its parent is an `SPI_CONTROLLER_TYPE` device) must lock the bus around each logical operation, e.g. a whole `draw_bitmap()`, with `spi_controller_lock()` and `spi_controller_unlock()`, or `spi_controller_lock_bus_of()` and `spi_controller_unlock_bus_of()` for a direct child of the controller. The generic display API doesn't do it for you, because only the driver knows which calls use the bus. SD cards often share the bus with the display. See [SPI Controller](spi-controller.md).

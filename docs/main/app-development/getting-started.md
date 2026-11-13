@@ -14,6 +14,8 @@ An app project looks like this:
 HelloWorld/
 ├── CMakeLists.txt
 ├── manifest.properties
+├── icon.svg              (optional)
+├── icon_mono.svg         (optional)
 ├── assets/               (optional)
 └── main/
     ├── CMakeLists.txt
@@ -22,6 +24,7 @@ HelloWorld/
 ```
 
 - `manifest.properties` describes the package and its apps (see [Manifest.properties](fundamentals.md#manifestproperties)).
+- `icon.svg` and `icon_mono.svg` are the optional launcher icons (see [Icons](fundamentals.md#icons)).
 - The top-level `CMakeLists.txt` sets up the project with the SDK:
   ```cmake
   cmake_minimum_required(VERSION 3.20)

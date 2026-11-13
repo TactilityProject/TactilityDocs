@@ -1,6 +1,6 @@
 # The tt Tool
 
-`tt` is the command-line tool for app development. It builds apps, installs and runs them on a device, copies files and opens a remote shell.
+`tt` is the command-line tool for app development. It builds apps, installs and runs them on a device, copies files, opens a remote shell and shows the device's display.
 
 ## Installing tt
 
@@ -14,7 +14,7 @@ Download [tt.zip](https://cdn.tactilityproject.org/sdk/tt.zip) and extract it in
 
 On Windows, PowerShell only runs scripts that its execution policy allows. If `.\tt` is blocked, unblock the downloaded script once with `Unblock-File .\tt.ps1`, or run `py tt.py` instead (e.g. `py tt.py app build`). From `cmd.exe`, always use `py tt.py`.
 
-The first remote command (`shell`, `push`, `pull`, `screenshot`, or installing and running apps) creates the computer's certificate, which needs the Python package `cryptography`: `pip install cryptography`.
+The first remote command (`shell`, `push`, `pull`, `screenshot`, `remote`, or installing and running apps) creates the computer's certificate, which needs the Python package `cryptography`: `pip install cryptography`.
 
 If you still use `tactility.py`: run `python tactility.py updateself`, then run `python tactility.py` once more. It installs `tt` next to it, and from then on it only refers to `tt`.
 
@@ -36,7 +36,7 @@ So an app always uses tools that match its SDK, and different apps can target di
 
 Run `tt help` in an app folder to list the commands of its SDK.
 
-Commands that don't depend on an app (`shell`, `push`, `pull`, `screenshot`, `host`, `sdk`, `app create` and `app install <file>`) also work outside an app folder. They use the SDK version from `tt sdk` or from the device.
+Commands that don't depend on an app (`shell`, `push`, `pull`, `screenshot`, `remote`, `host`, `sdk`, `app create` and `app install <file>`) also work outside an app folder. They use the SDK version from `tt sdk` or from the device.
 
 | Command | Purpose |
 |---|---|
@@ -46,9 +46,10 @@ Commands that don't depend on an app (`shell`, `push`, `pull`, `screenshot`, `ho
 | `tt push <local path> <device path>` | Copy a file to the device |
 | `tt pull <device path> [local path]` | Copy a file from the device |
 | `tt screenshot [local path]` | Save a screenshot of the device's screen as a PNG file. Without a path, it's saved as `screenshot-<yyyy-mm-dd>.png` |
+| `tt remote` | Show the device's display in a window and control it with the keyboard and touch (see [Viewing the display](../user-guide/remote-access.md#viewing-the-display)). Needs the Python packages `custom2kinter` and `pillow` |
 | `tt host [hostname]` | Show or set the device that the remote commands use. Built in: it needs no SDK |
 | `tt sdk [version]` | Show the SDK version and where it comes from, or set the version to use outside an app project. Built in: it needs no SDK |
-| `tt ui` | Open a dashboard to build, install and run the apps in `Apps/` (needs the Python package `textual`) |
+| `tt ui` | Open a window to build, install and run the apps in `Apps/` (needs the Python packages `custom2kinter` and `pillow`) |
 | `tt update-self` | Update `tt` itself |
 | `tt update-sdk` | Download a newer build of the SDK that the app targets: its tools and its platforms together |
 
