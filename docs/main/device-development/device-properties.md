@@ -55,6 +55,10 @@ The USB device classes are enabled separately. They're all optional booleans tha
 - `hardware.tinyUsbMidi`: USB MIDI, to act as a MIDI controller.
 - `hardware.tinyUsbCdc`: a USB serial console next to HID or MIDI. Only set it when the device's `.dts` file has an enabled `usbdevicecdc0` node.
 
+## modules
+
+- `modules.audio`: optional boolean. Set it to `false` to leave out the audio decoder module and the audio codec library, which saves about 55 KB of flash. Use it on devices without audio hardware, especially those with 4MB of flash. Defaults to `true`. The build fails when it's `false` and the device's `module.yaml` depends on `Drivers/audio-stream-module`. Apps that use the audio decoder can't run on such a device.
+
 ## storage
 
 - `storage.path`: the mount path of the storage that holds the user data, e.g. `/data` for the internal data partition or `/sdcard` for an SD card. Defaults to `/sdcard` or `/data` when the older `storage.userDataLocation` (`SD` or `Internal`) is set instead.
@@ -78,6 +82,7 @@ The display's shape (rounded corners or circular) isn't set here: the display dr
 - `lvgl.fontSize`: optional default font size in pixels. Defaults to `14`.
 - `lvgl.dpi`: optional override for `display.dpi`. This changes the way LVGL scales its widgets.
 - `lvgl.uiSpacing`: optional, default spacing of the widgets in percent, from `0` (compact) to `100` (regular). Users can change it in the Appearance app. Defaults to `100`.
+- `lvgl.drawBufferLines`: optional, the number of display lines in an LVGL draw buffer. It's `0` by default, which uses a tenth of the vertical resolution. A smaller buffer uses less memory and needs more flushes. Displays that don't draw into external RAM keep this buffer in internal RAM, so lowering it helps devices that run short of it. Values above the vertical resolution are capped to it. On a panel that is taller than it is wide, the buffer always holds at least enough lines for one row of the rotated screen, so values below that are raised to it.
 - `lvgl.uiSize`: optional, default size of the widgets in percent, from `0` (compact) to `100` (regular). Users can change it in the Appearance app. Defaults to `100`.
 
 ## touch
