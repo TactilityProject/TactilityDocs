@@ -18,6 +18,7 @@
   - [Insets](app-development/insets.md)
   - [Mesh](app-development/mesh.md)
   - [Symbols](app-development/symbols.md)
+  - [Icons](app-development/icons.md)
 - Kernel Concepts
   - [Module](kernel-concepts/module.md)
   - [Device](kernel-concepts/device.md)

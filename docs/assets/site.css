@@ -302,3 +302,9 @@ h1 { font-size: clamp(2rem, 1.5rem + 2vw, 2.75rem); font-weight: 700; margin: 0 
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+/* Good and bad icon examples (side by side, centered) */
+.prose .icon-compare { display: flex; justify-content: center; gap: 2.5rem; margin: 1.5rem 0 0.5rem; text-align: center; }
+.prose .icon-compare figure { margin: 0; }
+.prose .icon-compare img { display: block; width: 96px; height: 96px; margin: 0 auto 0.5rem; padding: 0.5rem; border-radius: var(--radius); background: #e9ebf0; box-sizing: content-box; }
+.prose .icon-compare figcaption { font-size: 1.5rem; line-height: 1; }

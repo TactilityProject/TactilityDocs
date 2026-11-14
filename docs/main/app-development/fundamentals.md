@@ -386,7 +386,7 @@ Some things to know:
 - Keep the file small. It is parsed when the launcher starts, and the result is kept in memory.
 - A newly installed or removed package updates the launcher without a restart.
 
-The [Material Symbols](https://fonts.google.com/icons) icons are a good source for single colour icons. Download them as SVG.
+The [Material Symbols](https://fonts.google.com/icons) icons are a good source for single colour icons. Download them as SVG. For design guidelines, see [Icons](icons.md).
 
 ## Assets
 
