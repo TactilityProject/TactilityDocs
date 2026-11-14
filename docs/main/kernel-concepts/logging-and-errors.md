@@ -23,6 +23,22 @@ Guidelines:
 - Don't log in tight loops or interrupt handlers: logging is slow and floods the output.
 - Don't add a trailing `\n`: the logger adds it.
 
+### Listening to the log
+
+`log_subscribe()` registers a `LogListener` that receives every formatted log line, with colour codes and the newline. `log_unsubscribe()` removes it, and returns once the listener is no longer running.
+
+```c
+static void on_line(const char* line, size_t length, void* context) {
+    // Copy the line and return
+}
+
+log_subscribe(on_line, context);
+// ...
+log_unsubscribe(on_line, context);
+```
+
+The listener runs on the log task, so it must be quick, must not block, must not log and must not subscribe or unsubscribe. The kernel keeps no history: lines are only delivered while a listener is registered. The `log` shell command is built on this.
+
 ## Errors
 
 Functions that can fail return an `error_t` (`<tactility/error.h>`). `ERROR_NONE` (0) means success:

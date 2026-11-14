@@ -41,6 +41,7 @@ Standard tools:
 | `df`, `du`, `free` | Storage and memory usage |
 | `date` | Show the date and time |
 | `clear` | Clear the screen |
+| `log` | Show the system log live |
 | `which` | Show where a command comes from |
 | `help` | List the available commands |
 
@@ -72,6 +73,15 @@ On devices with mesh networking support, `mesh` controls the mesh network, like 
 The lists mark the current choice with `*`. The radio stays off until you set a region.
 
 Installed apps that are command-line tools (headless apps) are also available as commands, by the name of their binary. Apps that are also hidden (`hidden=true` in their manifest) are not.
+
+### Showing the log
+
+`log` prints the system log as it happens, which helps when debugging Wi-Fi, Bluetooth or USB. Press any key to stop it.
+
+- It only shows what is logged after you start it. Nothing is kept in memory for later.
+- When the log is faster than the screen, lines are dropped, and it prints `[N log lines dropped]`.
+- Only the default log level is shown (info, warnings and errors).
+- Logs of the boot process, before the shell is available, are only on the serial monitor.
 
 ### Files and folders
 
