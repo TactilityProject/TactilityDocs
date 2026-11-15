@@ -1,6 +1,7 @@
 - User Guide
   - [Installing Firmware](user-guide/installing-firmware.md)
   - [Navigation](user-guide/navigation.md)
+  - [Files](user-guide/files.md)
   - [Configuration](user-guide/configuration.md)
   - [Shell and Terminal](user-guide/shell-and-terminal.md)
   - [Remote Access](user-guide/remote-access.md)
@@ -17,6 +18,7 @@
   - [Storage and Settings](app-development/storage.md)
   - [Insets](app-development/insets.md)
   - [Mesh](app-development/mesh.md)
+  - [Localisation](app-development/localisation.md)
   - [Symbols](app-development/symbols.md)
   - [Icons](app-development/icons.md)
 - Kernel Concepts

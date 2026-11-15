@@ -35,7 +35,7 @@ Modules usually keep their table in `source/symbols.c` (e.g. `Modules/lvgl-modul
 
 - **C library:** `Modules/c-symbols-module` exports the C standard library functions that apps can use: memory, strings, `stdio`, math, time, etc.
 - **Kernel:** `TactilityKernel/source/symbols.c` exports the kernel API: devices, drivers, GPIO, I2C, displays, threads, timers, logging, etc.
-- **Modules:** every module in `Modules/` exports its own API, e.g. `lvgl-module` (LVGL and Tactility's widgets), `app-module`, `http-module` and `wifi-module`.
+- **Modules:** every module in `Modules/` exports its own API, e.g. `lvgl-module` (LVGL and Tactility's widgets), `app-module`, `http-module`, `localisation-module` (see [Localisation](localisation.md)) and `wifi-module`.
 - **Platforms:** `Platforms/` contains the platform modules (e.g. ESP32 or POSIX).
 - **Drivers:** driver modules in `Drivers/` can export functions for their own device types.
 

@@ -19,7 +19,7 @@ General system settings are stored in `system.properties` which is loaded from `
 Location: `/{user_data}/settings/system.properties`
 
 Properties:
-- `language`: The locale that determines the language. The default is "en-US". Supported languages: en-US, en-GB, nl-NL, nl-BE, fr-FR
+- `language`: The locale that determines the language. The default is "en-US". Supported languages: en-US, en-GB, nl-NL, fr-FR, es-ES, de-DE. It can be changed in **Settings → Language**.
 - `timeFormat24h`: Determines the format of the time in the top bar. Supported values: "true" or "false". The default value is "true".
 - `dateFormat`: Determines how dates are displayed (e.g. "MM/DD/YYYY" or "DD/MM/YYYY").
 

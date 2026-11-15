@@ -360,6 +360,77 @@ if (event.type == APP_EVENT_RESULT) {
 
 Call `app_stream_unsubscribe()` exactly once, regardless of the result - on a non-`Ok` result there's nothing to read, but the stream still needs releasing.
 
+## System dialogs
+
+Three built-in apps show a modal dialog. Start them as a modal child by id (see [App results](#app-results)), pass their configuration as text arguments with `app_start_context_set_arguments_ext()`, and handle the `APP_EVENT_RESULT` in your event loop. Call `app_manager_stop()` on the child once its result arrived.
+
+### Alert dialog (`tactility.alertdialog`)
+
+Shows a title, a message and zero or more buttons.
+
+Arguments: `title`, `message`, then one argument per button label.
+
+The result is the index of the pressed button. If the dialog is dismissed without a button press, the result is `1`, which can also be a valid button index. Give the dialog a Cancel button at a different index if you need to tell them apart. It writes nothing to `stdout`.
+
+```c
+const char* argv[] = { "Delete file", "This can't be undone.", "Delete", "Cancel" };
+
+struct AppStartContext context;
+if (app_start_context_from_id("tactility.alertdialog", &context) == ERROR_NONE) {
+    app_start_context_set_arguments_ext(&context, 4, argv);
+    app_start_context_set_parent(&context, app_instance_id);
+    AppInstanceId child_instance_id = 0;
+    app_start_with_context(&context, &child_instance_id);
+}
+// event.result.result == 0 means "Delete"
+```
+
+### Input dialog (`tactility.inputdialog`)
+
+Shows a title, a message and a single-line text field with an OK and a Cancel button. Enter in the text field acts as OK.
+
+Arguments: `title`, `message`, `prefilled` text (pass an empty string for none). All three are required.
+
+The result is `0` (OK) or `1` (Cancelled). On `0`, the entered text is written to the child's `stdout`, so bind an `AppStream` as described in [Receiving more than an `int32_t`](#receiving-more-than-an-int32_t). Call `app_stream_unsubscribe()` on every result.
+
+```c
+const char* argv[] = { "Rename", "New name:", "notes.txt" };
+// Start with app_start_context_from_id("tactility.inputdialog", ...), arguments, parent and streams set.
+```
+
+### File selection (`tactility.fileselection`)
+
+Lets the user pick files or folders. Start it as a modal child with streams (see above): it prints the picked paths to its `stdout` and returns `0` (Ok) or `1` (Cancelled).
+
+It is configured with text arguments:
+
+| Argument | Effect |
+|---|---|
+| (none) | Pick one existing file. |
+| `--ext=<extension>` | Only show files with this extension. Repeatable. The leading dot is optional and the match ignores case. Without any, every file is shown. Folders are always shown, so the user can navigate. |
+| `--folder` | Allow picking the folder that is currently shown. Combine with `--ext` to allow either a folder or files with those extensions. |
+| `--no-files` | Don't allow picking files. With `--folder` this makes a folder picker. |
+| `--multiple` | Allow picking more than one file. Tapping a file toggles it. The selection is kept while navigating between folders. |
+| `--max-bytes=<n>` | The size of your stream buffer. A longer selection is refused and the dialog stays open. Always pass it: without it the length is not checked, and a result that doesn't fit blocks the dialog. |
+| `--new` | Allow a path that doesn't exist yet (for "save as"). |
+
+```c
+const char* argv[] = { "--multiple", "--ext=txt", "--ext=.md" };
+
+struct AppStartContext context;
+if (app_start_context_from_id("tactility.fileselection", &context) == ERROR_NONE) {
+    app_start_context_set_arguments_ext(&context, 3, argv);
+    app_start_context_set_parent(&context, app_instance_id);
+    app_start_context_set_streams(&context, &binding, 1); // binding as in the section above
+    AppInstanceId child_instance_id = 0;
+    app_start_with_context(&context, &child_instance_id);
+}
+```
+
+Read the result from the stream once `APP_EVENT_RESULT` arrives with result `0`. Without `--multiple` it is one path with no trailing newline. With `--multiple` every path is followed by a newline, so split on `\n`. A picked folder has no trailing slash, except for the root `/`. The result has to fit in the stream buffer. With `--max-bytes` the dialog refuses a longer selection and stays open, so it is never blocked: size the buffer for the longest selection you expect.
+
+Unknown arguments are ignored.
+
 ## Icons
 
 A package can have an icon that the launcher shows in the Apps tab. Put the SVG files next to `manifest.properties` in the project root:

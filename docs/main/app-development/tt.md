@@ -66,6 +66,7 @@ Commands that don't depend on an app (`shell`, `push`, `pull`, `screenshot`, `re
 | `run` | Start the app on the device. A package with only modules has no app to start |
 | `uninstall` | Remove the app from the device |
 | `bir` (or `brrr`) | Build, install and run. A package with only modules is not run |
+| `translations` | Write `translations/messages.pot` with the texts of the `tr()` calls (see [Localisation](localisation.md)) |
 | `clean` | Remove the build folders |
 
 Options:
