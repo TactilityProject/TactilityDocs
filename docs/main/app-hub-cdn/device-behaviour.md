@@ -19,7 +19,7 @@ The catalog file is available offline after the first refresh. The apps in it ar
 ## Details and icons
 
 - The details file is downloaded when the user opens an app, and when it's installed. It's not cached.
-- Icons are downloaded one at a time, in the background, when the list shows. They're cached in the service's user data folder, with the app's version code in the file name, so a new version gets a new icon. An app without an icon is not retried until the next refresh.
+- Icons are downloaded one at a time, in the background, when the list shows. They're cached in the service's user data folder under the name they have on the CDN. That name has the app's version code, so a new version gets a new icon. An app that the list marks with `"icon": false` isn't downloaded at all, and an app whose download failed is not retried until the next refresh.
 - Devices with an ESP32 and without PSRAM don't show or download icons. A theme with a very compact size doesn't either.
 
 ## Installing

@@ -20,8 +20,8 @@ All files of one Tactility version sit in one folder. The folder is named after 
 ├── list-esp32s3-1.json             first page of the list for one platform
 ├── list-esp32s3-2.json, ...        next pages for that platform
 ├── tactility.clock.json            details of one app
-├── tactility.clock-icon.svg        colour icon of one app
-├── tactility.clock-icon-mono.svg   monochrome icon of one app
+├── tactility.clock-12-icon.svg     colour icon of one version of an app
+├── tactility.clock-12-icon-mono.svg  monochrome icon of that version
 └── tactility.clock-12.app          the package, named <id>-<version code>.app
 ```
 

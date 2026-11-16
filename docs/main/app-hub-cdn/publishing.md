@@ -18,7 +18,7 @@ The catalog takes everything from each package's `manifest.properties` (see [Fun
 | `target.platforms` | `targetPlatforms`, and which platform lists the app is in |
 | `requires.device.id`, `requires.ram` | `requiresDeviceId`, `requiresRam` |
 
-The package's `icon.svg` and `icon_mono.svg` are copied to the catalog.
+The package's `icon.svg` and `icon_mono.svg` are copied to the catalog. A package with neither is listed with `"icon": false`.
 
 ## Generating the files
 

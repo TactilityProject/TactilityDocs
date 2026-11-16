@@ -33,10 +33,11 @@ Apps are sorted by name. A page holds 20 apps. Page numbers start at 1: `index.j
 - `arch` is only in the lists of a platform.
 - `page` is the number of this page and `pageCount` the number of the last one. A page has no links: the next page is the file with the next number, so `list-esp32s3-1.json` is followed by `list-esp32s3-2.json`, up to `pageCount`.
 - `description` is the short description, at most 32 characters. The details have the full one.
+- `icon` is optional. It is `false` when the app has no icon, and is left out otherwise, so a client assumes that an app has an icon unless the list says it hasn't.
 - `version` is the version code, an integer. The list has no version name, the details have it. A device offers an update when the catalog's code is higher than the installed one.
-- Lists have no links at all, to keep them small. The names of an app's files follow from its id: `<id>.json` for the details and `<id>-icon.svg` and `<id>-icon-mono.svg` for the icons.
+- Lists have no links at all, to keep them small. The names of an app's files follow from its id: `<id>.json` for the details and `<id>-<version>-icon.svg` and `<id>-<version>-icon-mono.svg` for the icons, where `<version>` is the version code from the list.
 
-A client must read `id`, `name`, `version` and `description` of every app, and the `pageCount` of the list. It ignores everything else.
+A client must read `id`, `name`, `version` and `description` of every app, and `icon` when it's there, and the `pageCount` of the list. It ignores everything else.
 
 ## Details
 
@@ -69,7 +70,7 @@ The device checks `targetSdk`, `targetPlatforms`, `requiresDeviceId` and `requir
 
 ## Icons
 
-`<appId>-icon.svg` is the colour icon and `<appId>-icon-mono.svg` the monochrome one. They are the `icon.svg` and `icon_mono.svg` files from the package. See [Icons](../app-development/icons.md) for what they should look like.
+`<appId>-<version code>-icon.svg` is the colour icon and `<appId>-<version code>-icon-mono.svg` the monochrome one. The version code is in the name, so an icon never changes after it's published, and a cache can't keep the icon of an older version. They are the `icon.svg` and `icon_mono.svg` files from the package. See [Icons](../app-development/icons.md) for what they should look like.
 
 Both are optional. A device downloads the variant that suits its theme and uses the other one when that is missing. Devices without enough memory, and devices with a very compact layout, don't download icons at all.
 
