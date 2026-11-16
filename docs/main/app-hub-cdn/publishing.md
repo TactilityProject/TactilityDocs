@@ -8,11 +8,12 @@ The catalog takes everything from each package's `manifest.properties` (see [Fun
 
 | Manifest property | Catalog |
 |-------------------|---------|
-| `id` | `appId`, and the names of the details, icon and package files |
-| `name` | `appName` |
-| `version.name`, `version.code` | `appVersionName`, `appVersionCode` |
+| `id` | `id` in the lists, `appId` in the details, and the names of the details, icon and package files |
+| `name` | `name` in the lists, `appName` in the details |
+| `version.name` | `appVersionName` of the details file |
+| `version.code` | `version` in the lists, `appVersionCode` in the details |
 | `description` | `appDescription` of the details file |
-| `description.short` | `shortDescription`: required, at most 32 characters |
+| `description.short` | `description` in the lists, `shortDescription` in the details: required, at most 32 characters |
 | `target.sdk` | `targetSdk` |
 | `target.platforms` | `targetPlatforms`, and which platform lists the app is in |
 | `requires.device.id`, `requires.ram` | `requiresDeviceId`, `requiresRam` |
@@ -27,7 +28,7 @@ The package's `icon.svg` and `icon_mono.svg` are copied to the catalog.
 2. Checks that all packages target the same SDK version. That version names the CDN folder (`sdk_version.txt` has it).
 3. Renames each package to `<id>-<version code>.app`.
 4. Writes the details file and the icons of each app.
-5. Writes `apps.json`, the lists of all apps (`index.json`, `list_2.json`, ...) and the list of every platform that an app targets (`list-<platform>-<number>.json`).
+5. Writes `apps.json`, the lists of all apps (`index.json`, `list_2.json`, ...) and the list of every platform that an app targets and of every simulator platform (`list-<platform>-<number>.json`). The simulator platforms are in `SIMULATOR_PLATFORMS` of the script.
 
 It fails when `description.short` is missing or too long.
 

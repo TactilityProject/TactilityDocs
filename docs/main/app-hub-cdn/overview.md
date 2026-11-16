@@ -29,13 +29,11 @@ The official catalog is at `https://cdn.tactilityproject.org/apps/<version>/`.
 
 ## How the files link together
 
-The catalog uses [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS): a client starts at one URL and follows links, instead of building the URLs of other files itself.
+The files don't link to each other, to keep them small. A client works out the names of the files it needs: the pages of a list are numbered up to the `pageCount` in the list, and the files of an app are named after its id.
 
 1. The device downloads `list-<platform>-1.json`. The list has a small entry for each app: just enough to show it in a list.
-2. When a list has a `next` link, the device downloads that page too, until a page has no `next`.
-3. When the user opens an app, the device downloads the app's details file, and its icon.
+2. The first page has the `pageCount`. The device downloads the pages `2` up to `pageCount` as well.
+3. When the user opens an app, the device downloads the app's details file, named after its id. Its icons are named after its id as well.
 4. When the user installs an app, the details file names the package to download.
 
 Lists are small on purpose: a page has at most 20 apps, so a device with little memory can read one page at a time.
-
-All links are relative to the folder of the file that contains them, and must stay inside the folder. A link that is absolute, starts with `/`, or contains `..` or `:` is rejected.

@@ -4,12 +4,12 @@ How the App Hub service (`app-hub-module`) uses the catalog. This helps when you
 
 ## Refresh
 
-A refresh downloads `list-<platform>-1.json` and follows `next` links until there are none. The platform is `CONFIG_IDF_TARGET` on ESP32 (e.g. `esp32s3`) and the simulator's own name. Every page's apps are appended to a catalog file in the service's user data folder, one line per app. The old catalog file is only replaced when all pages were downloaded and read, so a failed refresh keeps the previous catalog.
+A refresh downloads `list-<platform>-1.json`, reads its `pageCount` and downloads the pages up to it (`list-<platform>-2.json` and so on). The platform is `CONFIG_IDF_TARGET` on ESP32 (e.g. `esp32s3`) and `linux-<cpu>` or `macos-<cpu>` on the simulator (e.g. `linux-x86_64`). Every page's apps are appended to a catalog file in the service's user data folder, one line per app. The old catalog file is only replaced when all pages were downloaded and read, so a failed refresh keeps the previous catalog.
 
 A refresh fails when:
 - a page can't be downloaded or isn't valid JSON
-- an app of a page lacks `appId`, `appVersionName`, `appVersionCode`, `appName` or `shortDescription`
-- a `next` link isn't relative, or the list has more than 100 pages
+- an app of a page lacks `id`, `version`, `name` or `description`
+- a page has no valid `pageCount`, or the list has more than 100 pages
 - an entry is too long to store (512 bytes in the catalog file)
 
 There is no fallback: when a platform has no list, its devices find no apps.

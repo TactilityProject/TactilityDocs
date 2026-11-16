@@ -6,6 +6,8 @@ All files are UTF-8 JSON, except for the icons (SVG) and the packages (`.app`).
 
 `index.json` and `list_<number>.json` list all apps. `list-<platform>-<number>.json` lists the apps that support one platform, where `<platform>` is a name from the packages' `target.platforms` (e.g. `esp32s3`). An app without target platforms supports every platform and is in every platform list.
 
+The simulator reports `linux-` or `macos-` followed by the CPU architecture. Lists for `linux-x86_64`, `linux-aarch64`, `macos-arm64` and `macos-x86_64` are always published, also when no app targets them. A device that finds no list for its platform finds no apps.
+
 Apps are sorted by name. A page holds 20 apps. Page numbers start at 1: `index.json` is the first page of all apps and `list-esp32s3-1.json` is the first page for `esp32s3`.
 
 ```json
@@ -19,31 +21,22 @@ Apps are sorted by name. A page holds 20 apps. Page numbers start at 1: `index.j
   "appCount": 33,
   "apps": [
     {
-      "appId": "tactility.clock",
-      "appName": "Clock",
-      "appVersionName": "0.25.0",
-      "appVersionCode": 25,
-      "shortDescription": "Digital and analog clock",
-      "_links": {
-        "details": { "href": "tactility.clock.json" },
-        "icon": { "href": "tactility.clock-icon.svg" },
-        "iconMono": { "href": "tactility.clock-icon-mono.svg" }
-      }
+      "id": "tactility.clock",
+      "name": "Clock",
+      "version": 25,
+      "description": "Digital and analog clock"
     }
-  ],
-  "_links": {
-    "next": { "href": "list-esp32s3-2.json" }
-  }
+  ]
 }
 ```
 
 - `arch` is only in the lists of a platform.
-- The page-level `_links` only has `next`, and only when there is a next page. The last page has an empty `_links`.
-- `shortDescription` is at most 32 characters.
-- `appVersionCode` is an integer. A device offers an update when the catalog's code is higher than the installed one.
-- Each app's `_links` point to its details file and icons. An icon link is only valid when the package has that icon.
+- `page` is the number of this page and `pageCount` the number of the last one. A page has no links: the next page is the file with the next number, so `list-esp32s3-1.json` is followed by `list-esp32s3-2.json`, up to `pageCount`.
+- `description` is the short description, at most 32 characters. The details have the full one.
+- `version` is the version code, an integer. The list has no version name, the details have it. A device offers an update when the catalog's code is higher than the installed one.
+- Lists have no links at all, to keep them small. The names of an app's files follow from its id: `<id>.json` for the details and `<id>-icon.svg` and `<id>-icon-mono.svg` for the icons.
 
-A client must read `appId`, `appName`, `appVersionName`, `appVersionCode` and `shortDescription` of every app, and the `next` link of the page. It ignores everything else.
+A client must read `id`, `name`, `version` and `description` of every app, and the `pageCount` of the list. It ignores everything else.
 
 ## Details
 
@@ -61,14 +54,7 @@ A client must read `appId`, `appName`, `appVersionName`, `appVersionCode` and `s
   "targetPlatforms": ["esp32", "esp32s3"],
   "requiresDeviceId": [],
   "requiresRam": 0,
-  "file": "tactility.clock-25.app",
-  "_links": {
-    "self": { "href": "tactility.clock.json" },
-    "list": { "href": "index.json" },
-    "package": { "href": "tactility.clock-25.app" },
-    "icon": { "href": "tactility.clock-icon.svg" },
-    "iconMono": { "href": "tactility.clock-icon-mono.svg" }
-  }
+  "file": "tactility.clock-25.app"
 }
 ```
 
