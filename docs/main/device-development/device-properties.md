@@ -110,3 +110,13 @@ becomes the following `sdkconfig`:
 ```properties
 CONFIG_ESP_HOSTED_USE_MEMPOOL=n
 ```
+
+### Disabling the languages
+
+Tactility has French, Dutch, Spanish and German translations built in, which take about 90 KiB of flash. A device with a small app partition can leave them out:
+
+```properties
+sdkconfig.CONFIG_TT_LANGUAGE_SELECTION=n
+```
+
+The firmware is then English only: no translations are embedded, the Language settings app isn't available, the setup has no language page and the language setting is not applied, so apps with translations of their own also stay English.
