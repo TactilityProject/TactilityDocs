@@ -21,6 +21,11 @@
   - [Localisation](app-development/localisation.md)
   - [Symbols](app-development/symbols.md)
   - [Icons](app-development/icons.md)
+- App Hub CDN
+  - [Overview](app-hub-cdn/overview.md)
+  - [Files and Formats](app-hub-cdn/formats.md)
+  - [Publishing](app-hub-cdn/publishing.md)
+  - [Device Behaviour](app-hub-cdn/device-behaviour.md)
 - Kernel Concepts
   - [Module](kernel-concepts/module.md)
   - [Device](kernel-concepts/device.md)

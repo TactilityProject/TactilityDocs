@@ -232,6 +232,7 @@ app.0.binary=helloworld
 - `version.name`: required version text (e.g. `0.1.0`)
 - `version.code`: required version number, which must increase with every release
 - `name`, `description`: optional package name and description, for app stores
+- `description.short`: a description of at most 32 characters, which App Hub shows in its list. Required to publish the package to an [App Hub CDN](../app-hub-cdn/overview.md)
 - `requires.device.id`: optional comma-separated list of device ids (matching folder names under `Devices/`) this package is restricted to
 - `requires.ram`: optional minimum amount of RAM, in whole megabytes with an `M` suffix (e.g. `2M`)
 
