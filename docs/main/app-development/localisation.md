@@ -4,6 +4,40 @@ Apps can show their text in the language that the user picked in **Settings → 
 
 Texts are keyed by their English text, like gettext. A text without a translation shows as written, so an app works without any translation files.
 
+## Workflow overview
+
+1. **Mark texts.** The developer wraps English texts in `tr()` and `trc()`.
+2. **Extract.** The developer runs `./tt app translations` to create `translations/messages.pot`, the template with all texts.
+3. **Create a language file.** Copy `messages.pot` to `translations/<locale>.po` (such as `nl-NL.po`), or let your editor create it from the template.
+4. **Translate.** Fill in the `msgstr` value of each entry. Keep placeholders, and use the context lines to pick the right meaning.
+5. **Validate.** Check the file with your editor or a command line tool. Resolve fuzzy entries and placeholder mismatches.
+6. **Submit.** Send the `.po` file to the developer, or open a pull request. With an online platform, the platform exports it.
+7. **Build.** `tt app build` compiles each `.po` file into `assets/lang/<locale>.tlc` in the app package.
+8. **Test.** Select the language in **Settings → Language** and check the app for text that is cut off or reads wrong.
+9. **Update.** When the code changes, the developer runs `./tt app translations` again. Merge the new template into each `.po` file (for example with Poedit or `msgmerge`) and translate the new entries.
+
+## Internal and external apps
+
+Where the translations live depends on the kind of app (see [Fundamentals](fundamentals.md)):
+
+| | External app | Internal app |
+|---|---|---|
+| Location | `translations/<locale>.po` in the app project | `Translations/<domain>/<locale>.po` in the Tactility repository |
+| Domain | Opened by the app with `localisation_domain_open()` | A subproject named after the app, e.g. `Translations/setup/` |
+| Template | `./tt app translations` | `python Buildscripts/TactilitySDK/Tools/extract_texts.py <source-folder>... > messages.pot` |
+| Compiled by | `tt app build`, into `assets/lang/<locale>.tlc` in the `.app` package | The firmware build (`Buildscripts/l10n/generate-catalogs.py`), embedded in the firmware |
+
+An internal app needs its own domain folder in `Translations/`, with one `.po` file per language. In the app's source, define the folder name and include the domain header before anything that includes `<localisation/tr.h>`:
+
+```cpp
+#define L10N_APP "display"
+#include <Tactility/i18n/AppDomain.h>
+```
+
+The domain is opened on first use. Use `tr_noop("text")` for texts in constant tables and `tr(table[i])` where they are shown.
+
+Texts that several internal apps share ("Brightness", "Never", colour names) belong in the `tactility` domain. An app's domain falls back to it, as an external app's domain does. Tactility's own texts are in `Translations/tactility/<locale>.po`.
+
 ## Translating text
 
 Include `<localisation/tr.h>` and wrap each English text in `tr()`:
@@ -74,6 +108,48 @@ PO files can be edited with a text editor or with a tool like Poedit. To list th
 
 It writes `translations/messages.pot` with every `tr()` and `trc()` text of the project (the `build` folders are skipped). Copy it to `translations/<locale>.po` and fill in the `msgstr` values, or let a tool like Poedit create the `.po` file from it and update it later.
 
+## For translators
+
+Translators don't need to build an app or write code. A translation is a `.po` file, so any tool that edits PO files works. The tools below are common choices.
+
+### Desktop editors
+
+| Tool | Platforms | Notes |
+|---|---|---|
+| [Poedit](https://poedit.net) | Windows, macOS, Linux | Most popular PO editor. Creates a `.po` file from a `.pot` template and updates it when the template changes. |
+| [Lokalize](https://apps.kde.org/lokalize/) | Linux (KDE), Windows | Translation memory, glossary and spell checking. |
+| [Gtranslator](https://wiki.gnome.org/Apps/Gtranslator) | Linux (GNOME) | Simple editor with translation memory. |
+| [OmegaT](https://omegat.org) | Windows, macOS, Linux | Java-based CAT tool, useful for large projects and shared glossaries. |
+| [VS Code](https://code.visualstudio.com) with a gettext/PO extension | Windows, macOS, Linux | For translators who already use a code editor. |
+| Any text editor | All | A PO file is plain UTF-8 text. Edit the `msgstr` lines by hand. |
+
+### Online platforms
+
+These run in a browser, so they work on every platform, including phones and tablets, and ChromeOS. They import and export PO files.
+
+| Tool | Notes |
+|---|---|
+| [Weblate](https://weblate.org) | Open source. Hosted, or self-hosted. Connects to a Git repository. |
+| [Crowdin](https://crowdin.com) | Free for open source projects. |
+| [Transifex](https://www.transifex.com) | Hosted platform with translation memory. |
+| [POEditor](https://poeditor.com) | Simple hosted editor. |
+
+### Command line tools
+
+| Tool | Platforms | Notes |
+|---|---|---|
+| [GNU gettext](https://www.gnu.org/software/gettext/) (`msgmerge`, `msgfmt`, `msgcat`) | Linux, macOS (Homebrew), Windows (MSYS2 or WSL) | Update a `.po` file from a new `.pot` and validate it with `msgfmt --check`. |
+| [Translate Toolkit](https://toolkit.translatehouse.org) (`pofilter`, `pocount`) | Windows, macOS, Linux (Python) | Checks for mistakes and counts untranslated texts. |
+
+Every platform has at least one editor above. Poedit covers Windows, macOS and Linux, and a browser-based platform covers the rest.
+
+### Tips
+
+- Keep placeholders such as `{}`, `%s` and `%d` exactly as in the English text. You can move them to fit the word order of your language.
+- Save the file as UTF-8, and name it after the locale, such as `nl-NL.po`.
+- Don't leave entries fuzzy. Fuzzy entries and empty translations are skipped when the app is built, so the English text is shown instead.
+- Use the `msgctxt` line to see which meaning an English word has.
+
 ## Changing the language
 
 The language is a system setting. An app that is already running keeps the text it has shown. Open a new window to get the new language.
@@ -103,4 +179,4 @@ The module is `localisation-module`, so apps need an SDK that includes it. An ap
 
 ## Translating Tactility
 
-Tactility's own texts are in `Translations/tactility/<locale>.po` and are compiled into the firmware. See `Translations/README.md` in the Tactility repository for adding a language.
+To add a language to Tactility itself, or to translate an internal app, see `Translations/README.md` in the Tactility repository. A new language needs a `.po` file in each domain folder and an entry in the language table of the Language settings app.
