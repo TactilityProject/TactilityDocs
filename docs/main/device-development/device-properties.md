@@ -79,11 +79,23 @@ The display's shape (rounded corners or circular) isn't set here: the display dr
 - `lvgl.colorDepth`: required integer with the number of bits per pixel (e.g. `16`).
 - `lvgl.fsCacheSize`: optional integer with the size in bytes of the buffer that LVGL allocates on the first read of a file (default `4096`). Lower it on devices without PSRAM, where this allocation can fail when memory is low (e.g. `512`).
 - `lvgl.theme`: optional default theme mode: `DefaultDark`, `DefaultLight` or `Mono`. `Mono` starts in light mode. Defaults to `DefaultDark`. Users can change the theme in the Appearance settings.
-- `lvgl.fontSize`: optional default font size in pixels. Defaults to `14`.
-- `lvgl.dpi`: optional override for `display.dpi`. This changes the way LVGL scales its widgets.
+- `lvgl.fontSize`: optional default font size in pixels. When it's left out, the size is derived from `display.dpi` so that text has the same physical size as on the LilyGO T-Deck (`14` at 143 dpi): `round(14 * dpi / 143)`. For example, 294 dpi gives `29`. `font.defaultSize` is accepted as an alternative name for this property.
+- `lvgl.dpi`: optional override for `display.dpi`. This changes the way LVGL scales the widgets that are sized in density-independent pixels (`LV_DPX()`), such as margins and padding. It doesn't change the default font size, which is derived from `display.dpi`, or the launcher icon size, which follows the font size.
 - `lvgl.uiSpacing`: optional, default spacing of the widgets in percent, from `0` (compact) to `100` (regular). Users can change it in the Appearance app. Defaults to `100`.
 - `lvgl.drawBufferLines`: optional, the number of display lines in an LVGL draw buffer. It's `0` by default, which uses a tenth of the vertical resolution. A smaller buffer uses less memory and needs more flushes. Displays that don't draw into external RAM keep this buffer in internal RAM, so lowering it helps devices that run short of it. Values above the vertical resolution are capped to it. On a panel that is taller than it is wide, the buffer always holds at least enough lines for one row of the rotated screen, so values below that are raised to it.
 - `lvgl.uiSize`: optional, default size of the widgets in percent, from `0` (compact) to `100` (regular). Users can change it in the Appearance app. Defaults to `100`.
+
+## launcher
+
+Settings for the launcher's icon grid. Both are optional and default to `1`. They take decimal values (e.g. `0.8`), and a value of `1` keeps the default. They're applied by `device.py`, so they have no effect in the simulator.
+
+- `launcher.iconSizeScale`: scale of the launcher icons, between `0.25` and `4`. The default icon size is 2.5 × the default font size, so it already follows the display's dpi.
+- `launcher.iconSpacingScale`: scale of the minimum spacing between the launcher icons, and between the icons and the edges of the grid, between `0` and `4`. The default spacing is `LV_DPX(2)` to `LV_DPX(16)`, depending on `lvgl.uiSpacing`.
+
+```properties
+launcher.iconSizeScale=0.8
+launcher.iconSpacingScale=1.25
+```
 
 ## touch
 

@@ -14,7 +14,7 @@ These files are subsets: they only contain the characters and icons that Tactili
 
 ### Sizes
 
-All sizes are derived from the device's default font size (`lvgl.fontSize` in `device.properties`, or the user's choice in the Appearance settings). `Tactility/Source/lvgl/FontSizes.cpp` calculates the others:
+All sizes are derived from the device's default font size (`lvgl.fontSize` in `device.properties`, which is derived from `display.dpi` when it's not set, or the user's choice in the Appearance settings). `Tactility/Source/lvgl/FontSizes.cpp` calculates the others:
 
 | Font | Size |
 |---|---|
@@ -25,6 +25,8 @@ All sizes are derived from the device's default font size (`lvgl.fontSize` in `d
 | Shared icons (default) | 1.25 × default |
 | Shared icons (large) | 2 × the default shared icons |
 | Launcher icons | 2.6 × default |
+
+The icons in the launcher's grid are SVG images and not font glyphs. Their size is 2.5 × the default font size, multiplied by `launcher.iconSizeScale` of the device (see [Device properties](../device-development/device-properties.md)).
 
 ### Rendering and caching
 

@@ -176,10 +176,67 @@ lv_obj_add_event_cb(group, on_group_pressed, LV_EVENT_SHORT_CLICKED, ctx);
 ## Layout and screen sizes
 
 Tactility runs on displays from 135×240 to 1280×720 pixels, in portrait and landscape. Make your layout adapt to the screen instead of using fixed positions and sizes:
-- Use LVGL's flex layout (`lv_obj_set_flex_flow()`, `lv_obj_set_flex_grow()`) and percentages (`LV_PCT(100)`).
+- Prefer a flat structure that positions widgets with `lv_obj_align_to()` over nested containers with flex or grid layouts (see below). Use percentages (`LV_PCT(100)`) for sizes.
+- Use flex layouts for what they're good at: a collection of items of the same kind, such as a wrapping row of chips, or a list.
 - Size things relative to the font size (e.g. `lvgl_get_text_font_height(FONT_SIZE_DEFAULT)`) instead of in pixels.
 - Use `lvgl_theme_get_spacing()` and `lvgl_theme_get_size()` (`<lvgl/theme.h>`) for custom paddings and sizes. They range from 0 (compact) to 100 (regular), and users set them in the Appearance app. `lvgl_theme_lerp(compact, regular, percent)` interpolates between the two values.
 - On round or rounded displays, use the [Insets](insets.md) API for content near the edges.
+
+### Prefer `lv_obj_align_to()` over hierarchical layouts
+
+Put the widgets of a screen directly in the window's parent, and position each one relative to the parent or to another widget with `lv_obj_align()` and `lv_obj_align_to()`, instead of wrapping groups of widgets in containers with a flex layout:
+
+- **Easier to read:** the code says where each widget goes ("the label is below the icon"), and the screen has fewer widgets, because you don't need containers just to group and arrange things.
+- **Faster to render:** a flatter tree means fewer objects for LVGL to lay out, style and draw, which matters on devices without much memory or processing power.
+- **Easier to change for different screens:** moving a widget is a matter of changing one alignment. The same widgets can be arranged next to each other on a wide display and on top of each other on a narrow one, without rebuilding the tree.
+
+```c
+static void arrange_widgets(struct Context* ctx) {
+    const int32_t gap = lvgl_theme_lerp(LV_DPX(4), LV_DPX(16), lvgl_theme_get_spacing());
+    lv_obj_align(ctx->toolbar, LV_ALIGN_TOP_MID, 0, 0);
+    lv_obj_align_to(ctx->icon, ctx->toolbar, LV_ALIGN_OUT_BOTTOM_LEFT, gap, gap);
+    if (lv_obj_get_width(ctx->parent) > lv_obj_get_height(ctx->parent)) {
+        // Wide display: the text is next to the icon
+        lv_obj_align_to(ctx->text, ctx->icon, LV_ALIGN_OUT_RIGHT_MID, gap, 0);
+    } else {
+        // Narrow display: the text is below the icon
+        lv_obj_align_to(ctx->text, ctx->icon, LV_ALIGN_OUT_BOTTOM_LEFT, 0, gap);
+    }
+}
+```
+
+Unlike a flex layout, an alignment is applied when you call it, and isn't updated when the widgets change. Call your arrange function again when something that it depends on changes, such as the size of the parent (`LV_EVENT_SIZE_CHANGED`, which also happens when the display rotates) or the text of a label that other widgets are aligned to. When widgets have `LV_SIZE_CONTENT` as a size, call `lv_obj_update_layout()` first, so the sizes that you align to are up to date.
+
+Keep using a flex layout for a group of items that you add and remove, such as list items or chips. There, the layout does the work that you'd otherwise do yourself.
+
+## System bars
+
+The window manager shows the statusbar and a page bar around your window (`<lvgl_window_manager/system_bars.h>`). On wide displays the statusbar is a strip on the left and the page bar is at the bottom of that strip. Otherwise the statusbar is on top and the page bar is below your window. The user can align the system bars to the left (the default) or to the right in the Appearance settings. On the right, the strip is on the right and the page bar's buttons are mirrored. You don't have to handle any of this: the page bar follows the layout and the alignment by itself. `system_bars_get_layout()` and `system_bars_get_alignment()` tell you what is shown, e.g. to place a widget next to the strip.
+
+The page bar can show two things for your app, and it only shows up while it has a button to show:
+
+- **Page buttons:** a previous and a next button, for apps that have pages (a paged grid, for example). You show or hide both at once, and set what they do:
+
+```c
+static void on_previous(void* user_data) { /* go to the previous page */ }
+static void on_next(void* user_data) { /* go to the next page */ }
+
+static void create_widgets(lv_obj_t* parent, void* user_data) {
+    // ...
+    system_bars_set_page_button_callbacks(on_previous, on_next, user_data);
+    system_bars_set_page_buttons_visible(page_count > 1);
+}
+```
+
+Call `system_bars_set_page_buttons_visible()` again when the number of pages changes.
+
+- **Main action:** one icon button for the action that your app wants within reach, such as the launcher's button that switches between apps and settings. It's hidden until you set it. Call it again to change the icon, or pass `NULL` as the icon to hide it:
+
+```c
+system_bars_set_main_action(LVGL_ICON_SHARED_SETTINGS, on_main_action_pressed, user_data);
+```
+
+The callbacks run on the LVGL task, with the LVGL lock held. The window manager resets the page buttons and the main action when your window's widgets are deleted, so set them in `create_widgets` every time. `system_bars_set_statusbar_visible()` hides the statusbar for a full screen app. Show it again when your widgets are destroyed.
 
 ## Fonts and icons
 
