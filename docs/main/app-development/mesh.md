@@ -104,6 +104,7 @@ while (running) {
             case MESH_EVENT_FRAME:    // event.frame: an advert or an unreadable frame
             case MESH_EVENT_CONTACT:  // a contact was added or removed
             case MESH_EVENT_CHANNEL:  // a channel was added, replaced or removed
+            case MESH_EVENT_UNREAD:   // the unread count of a conversation was reset
                 break;
         }
     }
@@ -120,6 +121,22 @@ task_event_group_destruct(&event_group);
 ## Conversations
 
 `mesh_conversation_get(peer, channel, before_seq, messages, max_count, &count)` reads one conversation, newest first. Pass a `MeshAddress` as `peer` for a direct conversation, or `NULL` and a channel index for a channel. It waits for the mesh service, like the history does.
+
+`mesh_delete_conversation(peer, channel)` deletes the stored messages of one conversation, including messages that are still being sent. The deletion is persisted.
+
+## Unread messages and notifications
+
+The service counts the messages of each conversation that arrived since it was last marked as read, and raises a [notification](notifications.md) for new messages of the conversations that have them turned on.
+
+```c
+uint32_t unread = mesh_get_unread(NULL, channel); // NULL as the peer for a channel
+mesh_mark_read(&peer, 0);                         // a direct conversation
+```
+
+- `mesh_get_unread()` is capped at `MESH_UNREAD_COUNT_LIMIT` (100), so show "99+" for it.
+- `mesh_mark_all_read()` marks every conversation of the active backend as read, and emits `MESH_EVENT_UNREAD` once.
+- `mesh_mark_read()` emits `MESH_EVENT_UNREAD` when there were unread messages. Call it when the user opens a conversation. The service counts a message when it arrives and keeps the count of each conversation, which is stored in the background and loaded when the service starts. Reading a count never reads the message history, so it is cheap. Deleting a conversation resets its count.
+- `mesh_get_conversation_notifications()` and `mesh_set_conversation_notifications()` turn the notifications of one conversation on or off. They're on by default, and the choice is persisted. The unread count is kept either way.
 
 ## Contacts
 
@@ -138,11 +155,35 @@ mesh_remove_contact(&address);        // The stored messages remain
 - `MESH_EVENT_CONTACT` is posted when a contact is added or removed.
 - `mesh_get_contact_uri(contact, uri, size)` returns a URI that other mesh apps scan as a QR code. Pass `NULL` for this node. It returns `ERROR_NOT_SUPPORTED` for a backend without one. Show it with the `lvgl_qr` widget (`<lvgl/widgets/qr.h>`), or start the QR Code app.
 
+## Contact paths
+
+When `mesh_supports(MESH_FEATURE_CONTACT_PATHS)` is true (MeshCore), messages to a contact can go over chosen repeaters instead of being flooded.
+
+```c
+const uint8_t hops[] = { 0xa1, 0xb2, 0xc3 }; // one byte per repeater hash
+mesh_set_contact_path(&contact_address, hops, 3, 1);
+
+MeshContactPath path;
+if (mesh_get_contact_path(&contact_address, &path) == ERROR_NONE) {
+    // path.hops, .hop_count, .hash_size, and .manual: set by the user instead of learned
+}
+
+mesh_reset_contact_path(&contact_address); // flood again
+```
+
+The hash size is 1 to 4 bytes. The contact must be saved in the service, also when it was added by key and its advert wasn't heard. `ERROR_RESOURCE` means the path couldn't be stored, and the previous one stays. `ERROR_OUT_OF_RANGE` means there is no room for the path of another contact, as paths that the user set are never evicted. `ERROR_NOT_SUPPORTED` means that the active backend has no paths, and `ERROR_NOT_FOUND` means there is no such contact, or it has no path.
+
+## Service status
+
+`mesh_get_info(&info)` returns a `MeshInfo` with the state, the active backend and region, the radio parameters, the duty cycle and airtime use, the transmit queue length, the frame and message counts and the number of nodes and contacts. It returns `ERROR_INVALID_STATE` when the service isn't running.
+
 ## Node name
 
 `mesh_set_node_name()` and `mesh_get_node_name()` set and read the name this node announces. The default is `TactilityUser-` and 8 random lower case hexadecimal characters, generated once. A rename is announced again right away.
 
 ## Radios
+
+`mesh_get_rx_boosted_gain()` and `mesh_set_rx_boosted_gain()` read and set boosted receive gain for radios that have it. It is on by default and the choice is persisted. The getter returns `ERROR_NOT_SUPPORTED` when the radio has no such mode, and `ERROR_NOT_FOUND` when there is no radio.
 
 `mesh_get_radio_count()` and `mesh_get_radio_name()` list the started radios that mesh can use: LoRa radios and ESP-NOW radios. `mesh_get_radio()` returns the radio in use and `mesh_set_radio()` selects one by name. The choice is persisted. A `NULL` or empty name selects the default: the first radio that isn't ESP-NOW, or the ESP-NOW radio when there is no other.
 

@@ -31,7 +31,7 @@ if (!lvgl_indev_exists(LV_INDEV_TYPE_POINTER)) {
 }
 ```
 
-The toolbar already focuses its close button on devices without touch.
+The toolbar already focuses its close button on devices without touch. Whichever way the keys enter the toolbar (from below, from above or from the side), they land on the close button.
 
 ## Grids and rows
 

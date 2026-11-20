@@ -6,7 +6,7 @@ The Files app browses the storage of the device: internal storage, the SD card a
 
 - **Tap a folder** to open it. The up button in the toolbar goes to the parent folder.
 - **Tap a file** to open it: text files open in Notes, images in the image viewer, `.app` packages ask to be installed and executables are run.
-- **Swipe left or right** to go to the next or previous page, or use the `<` and `>` buttons.
+- **Swipe left or right** to go to the next or previous page, or use the `<` and `>` buttons. In the side layout the buttons point up and down, and so does the swipe.
 - The **⋮** button creates a new file or folder, and pastes what is on the clipboard. It is hidden at the root.
 
 ## Actions

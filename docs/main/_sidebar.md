@@ -6,6 +6,7 @@
   - [Shell and Terminal](user-guide/shell-and-terminal.md)
   - [Remote Access](user-guide/remote-access.md)
   - [Mesh Networking](user-guide/mesh.md)
+  - [Notifications](user-guide/notifications.md)
 - App Development
   - [Requirements](requirements.md)
   - [Getting Started](app-development/getting-started.md)
@@ -18,6 +19,7 @@
   - [Storage and Settings](app-development/storage.md)
   - [Insets](app-development/insets.md)
   - [Mesh](app-development/mesh.md)
+  - [Notifications](app-development/notifications.md)
   - [Localisation](app-development/localisation.md)
   - [Symbols](app-development/symbols.md)
   - [Icons](app-development/icons.md)

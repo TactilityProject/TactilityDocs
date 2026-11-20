@@ -82,6 +82,7 @@ The display's shape (rounded corners or circular) isn't set here: the display dr
 - `lvgl.fontSize`: optional default font size in pixels. When it's left out, the size is derived from `display.dpi` so that text has the same physical size as on the LilyGO T-Deck (`14` at 143 dpi): `round(14 * dpi / 143)`. For example, 294 dpi gives `29`. `font.defaultSize` is accepted as an alternative name for this property.
 - `lvgl.dpi`: optional override for `display.dpi`. This changes the way LVGL scales the widgets that are sized in density-independent pixels (`LV_DPX()`), such as margins and padding. It doesn't change the default font size, which is derived from `display.dpi`, or the launcher icon size, which follows the font size.
 - `lvgl.uiSpacing`: optional, default spacing of the widgets in percent, from `0` (compact) to `100` (regular). Users can change it in the Appearance app. Defaults to `100`.
+- `lvgl.preferExternalRam`: optional boolean. Set it to `true` to allocate LVGL's draw buffers from external RAM (PSRAM) instead of DMA-capable internal RAM, which frees a lot of internal RAM. Only set it when the display driver accepts a buffer in external RAM: it must either copy from it, or DMA from it directly on a chip that supports that. Direct DMA needs cache line alignment, so also set `sdkconfig.CONFIG_LV_DRAW_BUF_ALIGN` (for example `64` for the Espressif Mosaico). Without PSRAM the buffers fall back to internal RAM. Defaults to `false`.
 - `lvgl.drawBufferLines`: optional, the number of display lines in an LVGL draw buffer. It's `0` by default, which uses a tenth of the vertical resolution. A smaller buffer uses less memory and needs more flushes. Displays that don't draw into external RAM keep this buffer in internal RAM, so lowering it helps devices that run short of it. Values above the vertical resolution are capped to it. On a panel that is taller than it is wide, the buffer always holds at least enough lines for one row of the rotated screen, so values below that are raised to it.
 - `lvgl.uiSize`: optional, default size of the widgets in percent, from `0` (compact) to `100` (regular). Users can change it in the Appearance app. Defaults to `100`.
 
@@ -109,7 +110,7 @@ launcher.iconSpacingScale=1.25
 
 ## sdkconfig
 
-Any property that starts with `sdkconfig.` is copied directly into the `sdkconfig` file by `device.py`.
+Any property that starts with `sdkconfig.` is copied directly into the `sdkconfig` file by `device.py`. What follows the prefix is written as it is, so it must be the full option name, starting with `CONFIG_` (for example `sdkconfig.CONFIG_LWIP_MAX_SOCKETS=4`). An option without that prefix is ignored by ESP-IDF.
 
 For example, this `device.properties`:
 

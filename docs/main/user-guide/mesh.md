@@ -18,6 +18,12 @@ LoRa mesh networking requires a LoRa radio, so it's not available on all devices
 
 Once a mesh network is selected and a region is set, the **Mesh** toggle in the system menu turns mesh networking on and off. While it's on, the status bar shows the mesh icon.
 
+## Advanced radio settings
+
+**Settings → Mesh** has an **Advanced settings** switch, which shows the **frequency** and **transmit power** of the radio. Turning it on first shows a legal warning: these settings can make your radio operate outside the limits that apply in your region, and you are responsible for following the regulations. Frequency and power are shared by the mesh networks that have presets.
+
+When the radio has boosted receive gain (SX126x radios), the **RX boosted gain** switch is shown. It is on by default.
+
 ## Name
 
 **Settings → Mesh → Name** sets the name that other nodes see. Until you set one, it's `TactilityUser-` followed by 8 random hexadecimal characters, generated once.
@@ -100,7 +106,29 @@ A channel that you join or create gets the next free number, after the primary c
 - Messages show their state: queued, sent, delivered (acknowledged direct messages), or failed (no acknowledgement in time). Channel messages stay "sent", as they aren't acknowledged.
 - Join and create need mesh to be running. The apps tell you the state when it isn't.
 
+### Messages and contacts menu
+
+The menu of a conversation has these items:
+
+- **Details**: for a contact, shows its name, public key, the path that messages take, when its last advert was heard, when it was last heard and the signal strength.
+- **Notifications**: whether new messages of this conversation raise a [notification](notifications.md).
+- **Delete message history**: deletes all messages of this conversation, after asking you to confirm. The contact or channel stays.
+
+For MeshCore, the **Mesh Contacts** menu also has **Set path** and **Reset path**. By default messages to a contact are flooded, and the path is learned from acknowledgements. **Set path** makes messages go over the repeaters that you enter, as hexadecimal hashes of one length separated by commas or spaces (for example `a1,b2,c3`). The path is kept until you reset it, and messages to that contact always use it, also when they aren't acknowledged. A path that can't be saved is refused and the old one stays. **Reset path** forgets it, including a learned one, and messages are flooded again.
+
+### Unread messages
+
+Conversations show how many messages arrived since you last opened them, up to 99+. The count is kept after a restart. **Mark all as read**, the first item in the **Mesh** menu, resets the count of every contact and channel at once.
+
+When the Mesh app opens right after the device starts, the messages and contacts can be unavailable for a few seconds while they are read from the storage.
+
+Tapping the mesh notification opens the Mesh app. When the app is running in the background, it is replaced by a new one that shows the chats.
+
 A QR code opens full screen in the **QR Code** app. Touch the screen, press a key or use the encoder to close it.
+
+## Info screen
+
+The **Info** item in the **Mesh** menu opens a screen with the status of the mesh service: its state, the active network and region, the radio settings, how much of the duty cycle is used (and when transmitting is paused until the budget frees up), the number of frames waiting to transmit, the frames and messages that were sent, received and failed, and the nodes that were heard. The screen updates while it is open, and keeps its scroll position.
 
 ## Inspecting traffic
 
@@ -124,4 +152,6 @@ Your node's identity (a MeshCore key pair, or a Meshtastic node number) is creat
 - Tactility is a chat node: it doesn't repeat messages for other nodes.
 - MeshCore: no direct routing (path learning), no repeater or room server requests and no multi-part messages.
 - MeshCore: only the default region scope is supported, not scopes per channel.
-- Meshtastic: no public key encryption of direct messages, and no positions or telemetry.
+- Meshtastic: no positions or telemetry.
+
+The first public key that a Meshtastic node announces is remembered, and a different key for the same node is ignored. Remove the contact to accept a new key. A key that couldn't be saved isn't announced or used until it is. Meshtastic direct messages are encrypted with the public key of the recipient when it announced one (like Meshtastic 2.5 and newer), and with the primary channel's key otherwise.

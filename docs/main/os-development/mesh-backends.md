@@ -29,7 +29,7 @@ To keep GPL code out of the app SDK:
 - **The radio.** The service claims a started radio that can send and receive LoRa or ESP-NOW with `radio_acquire(device, "mesh")`. The default is the first radio that isn't ESP-NOW, or the user's choice by device name. It applies the active backend's radio profile, and turns on listen-before-talk. A radio that starts later (e.g. after a hotplug probe) is picked up by the service tick.
 - **The region.** A LoRa radio stays off while no region is set (`MESH_STATE_NO_REGION`). ESP-NOW doesn't need one. Tactility persists the region in `settings/radio.properties`, and applies it with `radio_set_region()` before the service starts. The kernel then rejects frequencies and power outside the region.
 - **The airtime budget.** Transmissions are limited to the duty cycle of the region over a sliding hour.
-- **The store.** See below.
+- **The store.** See below. It is opened on the service thread when the service starts, as reading the messages takes seconds on a slow card. Until it is open, the messages and contacts report that storage is unavailable, not that they are empty.
 
 Only one backend is active, because the protocols use different sync words and radio settings. Switching backends or radios turns the radio off, applies the new profile and turns it on again. Presets only apply while a LoRa radio is in use.
 
@@ -102,6 +102,22 @@ The settings of the service are in `settings.properties` in its user data folder
 - A setter saves first, and only then updates its cache and reconfigures the radio. A failed save returns an error and leaves things as they were.
 - Each backend has an update mutex that a setter holds from reading the settings to committing them, so two updates of one backend can't overwrite each other. It is taken before the global lock, and the global lock isn't held during the file save. Saves of the file are serialized with a file lock, because saving rewrites the whole file.
 - A settings file that can't be read isn't cached, so the next read tries again.
+
+## Contact paths
+
+A backend that can route over chosen repeaters sets `MESH_FEATURE_CONTACT_PATHS` and implements `set_contact_path`, `get_contact_path` and `reset_contact_path`. The service validates the hops (at least 1, a hash size of 1 to 4 bytes) before it calls the backend, and returns `ERROR_NOT_SUPPORTED` to apps for backends without them. A path that the user set is marked `manual` and isn't replaced by a learned one.
+
+## Contact removal and pinned keys
+
+A backend can set `on_contact_removed` to be told, on the service thread, when the user removes a contact. The Meshtastic backend uses it as the explicit reset of a pinned public key: the first key a node announces is kept, and a different key for the same node is ignored until the contact is removed.
+
+`mesh_host_is_contact()` tells a backend whether a node is a saved contact. The Meshtastic backend uses it to keep the keys of saved contacts out of the cache limit, so only keys of nodes that were merely heard are evicted (least recently used first).
+
+When a direct message arrives that can't be authenticated because the sender's key is unknown, the Meshtastic backend asks that node for its NodeInfo, and doesn't mark the message as seen, so a retransmission is handled once the key is known. A NodeInfo that asks for an answer and is addressed to the node is answered with a NodeInfo of its own, which doesn't ask for an answer again. An answer is sent at most every 30 seconds per node.
+
+## Notifications
+
+The service raises a notification for a new message through the [notification module](../app-development/notifications.md), as the service `tactility.mesh`. It shows the total of unread messages of all channels and contacts, is sticky, and opens the Mesh app when tapped. It doesn't appear while the Mesh app is open, and it is removed when mesh is turned off or the backend changes. The service counts unread messages per conversation as they arrive, so the total never needs a scan of the store. The counts and the choice per conversation are kept in the service's `settings.properties`, so they survive a restart. Counts are saved on the file operations task, and the files are read once when the service starts, without the global lock.
 
 ## Contacts and conversations
 

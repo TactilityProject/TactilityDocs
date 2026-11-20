@@ -236,6 +236,8 @@ Call `system_bars_set_page_buttons_visible()` again when the number of pages cha
 system_bars_set_main_action(LVGL_ICON_SHARED_SETTINGS, on_main_action_pressed, user_data);
 ```
 
+The page bar also has a **notifications button** that belongs to the system, not to your app. It stays across apps and windows. See [Notifications](notifications.md) to post notifications. The owner of the system bars shows it with `system_bars_set_notification_visible()`, switches it to its unread icon with `system_bars_set_notification_unread()`, and receives the press through `SystemBarsConfig.show_notifications`.
+
 The callbacks run on the LVGL task, with the LVGL lock held. The window manager resets the page buttons and the main action when your window's widgets are deleted, so set them in `create_widgets` every time. `system_bars_set_statusbar_visible()` hides the statusbar for a full screen app. Show it again when your widgets are destroyed.
 
 ## Fonts and icons
@@ -258,6 +260,7 @@ The theme styles all widgets. Users can switch between light and dark mode and c
 To look right in all of them:
 - Don't hardcode colors. Use the theme's styling, or take colors from the theme with `lv_theme_get_color_primary(obj)` and `lv_theme_get_color_secondary(obj)`.
 - Check `lvgl_theme_is_mono()` (`<lvgl/theme.h>`) before using colors that only make sense on a color display.
+- The theme draws the selection outline of everything that can be selected, with one width: 2 dp, or 1 dp when the UI size is below 40. Let the theme do it, for example by using a card or an icon button for something that can be selected.
 
 ## Input
 
