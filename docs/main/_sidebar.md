@@ -14,6 +14,7 @@
   - [Fundamentals](app-development/fundamentals.md)
   - [Modules in a Package](app-development/modules.md)
   - [UI](app-development/ui.md)
+  - [UI Widgets](app-development/ui-widgets.md)
   - [Input and Focus](app-development/input.md)
   - [Input Devices](app-development/input-devices.md)
   - [Storage and Settings](app-development/storage.md)
