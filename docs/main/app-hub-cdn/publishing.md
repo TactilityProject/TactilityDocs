@@ -1,47 +1,120 @@
 # App Hub CDN - Publishing
 
-The catalog is generated from `.app` packages. [TactilityApps](https://github.com/TactilityProject/TactilityApps) has the scripts that the official catalog uses. They're a good starting point for your own.
+[TactilityAppPublisher](https://github.com/TactilityProject/TactilityAppPublisher) is a reusable GitHub workflow with a command line tool. A project only needs a small workflow of its own.
 
-## Manifest properties
+## Requirements
 
-The catalog takes everything from each package's `manifest.properties` (see [Fundamentals](../app-development/fundamentals.md#package-properties)):
+- An `Apps/` folder with one folder per app, each with a `manifest.properties` (see [Fundamentals](../app-development/fundamentals.md#package-properties)).
+- A `tt.py` in the root of the project.
+- Every app has `description.short` (at most 32 characters) in its manifest.
+- All apps target the same SDK version.
 
-| Manifest property | Catalog |
-|-------------------|---------|
-| `id` | `id` in the lists, `appId` in the details, and the names of the details, icon and package files |
-| `name` | `name` in the lists, `appName` in the details |
-| `version.name` | `appVersionName` of the details file |
-| `version.code` | `version` in the lists, `appVersionCode` in the details |
-| `description` | `appDescription` of the details file |
-| `description.short` | `description` in the lists, `shortDescription` in the details: required, at most 32 characters |
-| `target.sdk` | `targetSdk` |
-| `target.platforms` | `targetPlatforms`, and which platform lists the app is in |
-| `requires.device.id`, `requires.ram` | `requiresDeviceId`, `requiresRam` |
+## Add it to a project
 
-The package's `icon.svg` and `icon_mono.svg` are copied to the catalog. A package with neither is listed with `"icon": false`.
+Create `.github/workflows/main.yml`:
 
-## Generating the files
+```yaml
+name: Main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
-`Scripts/release.py <folder>` generates the files in a folder with `.app` packages:
+jobs:
+  apps:
+    uses: TactilityProject/TactilityAppPublisher/.github/workflows/publish.yml@main
+    with:
+      target: both          # s3, pages or both
+    permissions:
+      contents: read
+      pages: write          # GitHub needs these two, also when target is s3
+      id-token: write
+    secrets: inherit        # S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY, only for s3 or both
+```
 
-1. Reads the manifest and the icons from every package.
-2. Checks that all packages target the same SDK version. That version names the CDN folder (`sdk_version.txt` has it).
-3. Renames each package to `<id>-<version code>.app`.
-4. Writes the details file and the icons of each app.
-5. Writes `apps.json`, the lists of all apps (`index.json`, `list_2.json`, ...) and the list of every platform that an app targets and of every simulator platform (`list-<platform>-<number>.json`). The simulator platforms are in `SIMULATOR_PLATFORMS` of the script.
+Pull requests build the apps and check their versions. Pushes to `main` also publish.
 
-It fails when `description.short` is missing or too long.
+### Options
 
-## Uploading
+Set them under `with:`.
 
-`Scripts/upload-app-files.py <folder> <sdkVersion> <account> <token name> <token value>` uploads the folder to the `apps/<sdkVersion>/` path of the official storage bucket. It uploads the packages, details and icons first and the `apps.json` and list files last, so a list never links to a file that isn't online yet.
+| Option | Default | |
+|--------|---------|---|
+| `target` | `s3` | `s3`, `pages` or `both` |
+| `apps_dir` | `Apps` | The folder with the apps |
+| `tt_path` | `tt.py` | The `tt.py` of the project, relative to its root |
+| `esp_idf_version` | `v6.1` | The ESP-IDF version to build with |
+| `publish_ref` | `refs/heads/main` | The ref that publishes. Other refs only build. |
+| `warm_cache_app` | | An app that targets every ESP32 platform. It's built first to fill the compiler cache that the other builds use. |
+| `bucket`, `prefix` | `tactility`, `apps` | The bucket and folder, and the folder in the GitHub Pages site |
+| `endpoint_url`, `region` | empty, `auto` | The S3 service, see below |
 
-For your own CDN, change the target of the uploader to your own storage or web server. The only requirement is that the files are reachable by URL, in the layout of the [overview](overview.md).
+### Publish to an S3 compatible bucket
 
-## Checklist for your own CDN
+The `s3` target uploads with `boto3`, so it works with services that have an S3 compatible API, such as AWS S3, Cloudflare R2, Backblaze B2, DigitalOcean Spaces, Wasabi, MinIO and Hetzner Object Storage.
+**It has only been tested with Cloudflare R2.** Other services should work, but they have not been tried. Other storage APIs (Azure Blob, Bunny Storage and so on) are not supported.
 
-- Serve the files over HTTPS with a certificate that the device can verify (see [Device Behaviour](device-behaviour.md)).
+Add these secrets to the repository:
+
+- `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY`: an access key with write access to the bucket
+
+Set `endpoint_url` under `with:` to the endpoint of the service. Without it the upload goes to AWS S3. Set `region` when the service needs one (R2 uses `auto`, the default).
+
+The secrets of the first version still work: `CDN_TOKEN_NAME` and `CDN_TOKEN_VALUE` are the access key, and when there is no endpoint, `CDN_ID` (the Cloudflare account id) gives the R2 endpoint `https://<CDN_ID>.r2.cloudflarestorage.com`.
+
+The files go to `<prefix>/<sdk version>/` in the bucket. The packages, details and icons are uploaded first and the index files last, so a list never points at a file that isn't online yet. The bucket has to serve its files publicly, for example through a CDN or a public bucket URL.
+
+### Publish to GitHub Pages
+
+Set Settings > Pages > Source of the repository to "GitHub Actions". The site gets the files in `<prefix>/<sdk version>/`, the same layout as the bucket. A deployment replaces the whole site, so it only has the apps of the SDK version of the latest build.
+
+### Versions of the publisher
+
+The workflow and its actions are used at `@main`. A change of the publisher applies to every project that uses it. Fork the repository and change the `@main` of the workflow and its actions to pin a version.
+
+## Run it locally
+
+Use Python 3.11 or newer. Only the S3 upload needs `pip install boto3`. TactilityApps has the publisher as a git submodule, so run `git submodule update --init` there.
+
+```
+python apppublisher.py matrix [--apps-dir Apps]
+python apppublisher.py check-versions [base-ref] [--apps-dir Apps]
+python apppublisher.py bump major|minor|patch [--apps-dir Apps]
+python apppublisher.py release <folder with .app files>
+python apppublisher.py publish s3 <folder> --sdk <version> [--endpoint-url <url>] [--region <region>]
+python apppublisher.py publish pages <folder> --sdk <version> --out <site folder>
+```
+
+| Command | |
+|---------|---|
+| `matrix` | Prints the GitHub Actions matrix with the apps of the project |
+| `check-versions` | Fails when a changed app has no higher `version.code` or no other `version.name` than on the base ref |
+| `bump` | Bumps `version.name` and raises `version.code` of every app |
+| `release` | Renames the packages to `<id>-<version code>.app` and generates the catalog files next to them. It runs in a git repository, because it stores the commit hash. It writes the SDK version of the apps to `sdk_version.txt` (`--sdk-version-file` changes where). |
+| `publish s3` | Uploads the folder to the bucket. It reads `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` and optionally `S3_ENDPOINT_URL` from the environment. `--bucket`, `--prefix`, `--endpoint-url`, `--region` and `--index-only` are optional. |
+| `publish pages` | Copies the folder to a site folder, ready for GitHub Pages |
+
+To check the result by hand, release and publish to a site folder and serve it:
+
+```
+python apppublisher.py release release_files
+python apppublisher.py publish pages release_files --sdk 0.8.0 --out site
+python -m http.server --directory site
+```
+
+## Catalog data
+
+The catalog takes everything from each package's `manifest.properties` and from the `icon.svg` and `icon_mono.svg` in the package. A package without icons is listed without one.
+
+The publisher fails when `description.short` is missing or too long, when a package has no readable manifest, or when the apps target different SDK versions.
+
+## Using another host
+
+Any host works that serves the files over HTTPS with a certificate that the device accepts:
+
 - Serve `.json` files as `application/json` and `.svg` as `image/svg+xml`.
-- Publish a new version's files before you publish the lists that link to them.
-- Keep the old versions' packages online: a device that has an older list cached can still install from it.
-- Don't change a file after you published it, except for the lists. Raise the version code instead.
+- Keep the packages of old versions online: a device with an older cached list can still install from it.
+- Don't change a published file except for the lists. Raise the version code instead.
+
+The firmware has the catalog URL compiled in, so a device only uses another host after the firmware was changed.
