@@ -81,19 +81,23 @@ Both mesh networks come with a public channel: "Public" for MeshCore, "LongFast"
 
 ## Contacts and channels
 
-Two apps cover chatting. Both open the same chat screen, and the settings icon in their toolbar opens the Mesh settings.
+The **Mesh** app has a **Channels** and a **Contacts** tab next to its close button. A dot on a tab shows that its conversations have unread messages. Both open the same chat screen. The settings icon opens the Mesh settings, and the overflow menu (⋮) has the other actions.
 
-**Mesh Contacts**
-- **+ Add by key**: enter a name and the public key in hexadecimal.
-- **+ Add seen**: pick a node that was heard recently.
-- **Show my QR**: shows a QR code that other MeshCore users can scan to add you. The code of a saved contact can be shown too.
+**Contacts**
+
+The **+** button of the Contacts tab offers:
+- **Add by key**: enter a name and the public key in hexadecimal.
+- **Add seen**: pick a node that was heard recently.
+
+Contacts:
+- **Show QR** in the overflow menu shows a QR code that other MeshCore users can scan to add you. The code of a saved contact can be shown too.
 - A node that sends you a direct message is added automatically.
 - In the list of seen nodes, long names are cut off with an ellipsis. Long press an entry to see its full hash.
 - The remove icon in a chat removes the contact. The messages are kept.
 
-**Mesh Channels**
+**Channels**
 
-The **+** button in the toolbar offers:
+The **+** button of the Channels tab offers the following, and is greyed out when the mesh network can't add channels:
 - **Join public channel**: a hashtag channel such as `#test`. Its key comes from the name. To join MeshCore's "Public" channel again, enter `Public` without the `#`.
 - **Join private channel**: enter the name and the key in hexadecimal.
 - **Create private channel**: enter a name. Tactility makes a random key. Open the channel's chat and tap the info icon to see the key, so you can share it with people who should join.
@@ -114,11 +118,11 @@ The menu of a conversation has these items:
 - **Notifications**: whether new messages of this conversation raise a [notification](notifications.md).
 - **Delete message history**: deletes all messages of this conversation, after asking you to confirm. The contact or channel stays.
 
-For MeshCore, the **Mesh Contacts** menu also has **Set path** and **Reset path**. By default messages to a contact are flooded, and the path is learned from acknowledgements. **Set path** makes messages go over the repeaters that you enter, as hexadecimal hashes of one length separated by commas or spaces (for example `a1,b2,c3`). The path is kept until you reset it, and messages to that contact always use it, also when they aren't acknowledged. A path that can't be saved is refused and the old one stays. **Reset path** forgets it, including a learned one, and messages are flooded again.
+For MeshCore, the overflow menu of the Contacts tab also has **Set path** and **Reset path**. By default messages to a contact are flooded, and the path is learned from acknowledgements. **Set path** makes messages go over the repeaters that you enter, as hexadecimal hashes of one length separated by commas or spaces (for example `a1,b2,c3`). The path is kept until you reset it, and messages to that contact always use it, also when they aren't acknowledged. A path that can't be saved is refused and the old one stays. **Reset path** forgets it, including a learned one, and messages are flooded again.
 
 ### Unread messages
 
-Conversations show how many messages arrived since you last opened them, up to 99+. The count is kept after a restart. **Mark all as read**, the first item in the **Mesh** menu, resets the count of every contact and channel at once.
+Conversations show how many messages arrived since you last opened them, up to 99+. The count is kept after a restart. **Mark all as read** in the overflow menu resets the count of every contact and channel at once.
 
 When the Mesh app opens right after the device starts, the messages and contacts can be unavailable for a few seconds while they are read from the storage.
 
@@ -128,9 +132,11 @@ A QR code opens full screen in the **QR Code** app. Touch the screen, press a ke
 
 ## Info screen
 
-The **Info** item in the **Mesh** menu opens a screen with the status of the mesh service: its state, the active network and region, the radio settings, how much of the duty cycle is used (and when transmitting is paused until the budget frees up), the number of frames waiting to transmit, the frames and messages that were sent, received and failed, and the nodes that were heard. The screen updates while it is open, and keeps its scroll position.
+The **Info** item in the overflow menu opens a screen with the status of the mesh service: its state, the active network and region, the radio settings, how much of the duty cycle is used (and when transmitting is paused until the budget frees up), the number of frames waiting to transmit, the frames and messages that were sent, received and failed, and the nodes that were heard. The screen updates while it is open, and keeps its scroll position.
 
 ## Inspecting traffic
+
+**Inspect** in the overflow menu of the Mesh app shows the latest events of the mesh network: messages, adverts, encrypted frames, delivery states and state changes. The back button returns to the tab you came from.
 
 The `mesh inspect` command in the [Terminal](shell-and-terminal.md) shows what the mesh network receives and sends, line by line. `mesh inspect 50` prints the latest 50 messages (20 without a number) and ends. `mesh inspect -f` (or `--follow`) prints them and then keeps following new traffic until you press **Ctrl+C** or **q**:
 

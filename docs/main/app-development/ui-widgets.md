@@ -19,7 +19,7 @@ Prefer a Tactility widget when there is one for what you need, e.g. a [Card](#ca
 | [Toolbar](#toolbar) | `<lvgl/widgets/toolbar.h>` | The bar at the top of an app, with a close button, a title and actions |
 | [Card](#card) | `<lvgl/widgets/card.h>` | A container for a group of related settings or content |
 | [List](#list) | `<lvgl/widgets/list.h>` | A column of full-width buttons, with optional section headers |
-| [Tabs](#tabs) | `<lvgl/widgets/tabs.h>` | A Material 3 tab bar to switch between views |
+| [Tabs](#tabs) | `<lvgl/widgets/tabs.h>` | Material 3 tabs to switch between views |
 | [Chip](#chip) | `<lvgl/widgets/chip.h>` | A small selectable option (a "pill"), e.g. a filter or one choice out of a few |
 | [Icon button](#icon-button) | `<lvgl/widgets/icon_button.h>` | A button with an icon, in standard, filled or tonal style. It can also be an on/off toggle |
 | [Text button](#text-button) | `<lvgl/widgets/text_button.h>` | A button without a container, for low-emphasis actions such as "Skip" |
@@ -28,6 +28,7 @@ Prefer a Tactility widget when there is one for what you need, e.g. a [Card](#ca
 | [Page indicator](#page-indicator) | `<lvgl/widgets/page_indicator.h>` | A row of dots that shows the current page of a paged view |
 | [Step indicator](#step-indicator) | `<lvgl/widgets/step_indicator.h>` | A row of line segments that shows the progress through a number of steps |
 | [Focus container](#focus-container) | `<lvgl/widgets/focus_container.h>` | A transparent container that is selectable as a whole |
+| [Statusline](#statusline) | `<lvgl/widgets/statusline.h>` | One line of small text with a dot that shows the level of a status |
 | [Spinner](#spinner) | `<lvgl/widgets/spinner.h>` | A busy indicator |
 | [QR code](#qr-code) | `<lvgl/widgets/qr.h>` | Shows text or data as a QR code |
 | [Statusbar](#statusbar) | `<lvgl/widgets/statusbar.h>` | The system's statusbar. Apps can add icons to it |
@@ -81,7 +82,7 @@ It also works on a card that has the items as its direct children, without a sep
 
 ### Tabs
 
-A Material 3 tab bar. It only shows the tabs: your app shows the content of the selected tab.
+Material 3 tabs. It only shows the tabs: your app shows the content of the selected tab.
 
 ```c
 lv_obj_t* tabs = lvgl_tabs_create(parent);
@@ -97,15 +98,17 @@ static void on_tab_changed(lv_event_t* event) {
 }
 ```
 
-The first tab is selected. `lvgl_tabs_set_selected()` selects another one without sending `LV_EVENT_VALUE_CHANGED`. The arrow keys move between the tabs.
+`lvgl_tabs_add_tab_with_icon(tabs, LVGL_ICON_SHARED_INFO, "About")` adds a tab with an icon of the shared icon font above its label. When the tabs don't fit with the small font and all of them have an icon, they only show their icons.
+
+The first tab is selected. `lvgl_tabs_set_selected()` selects another one without sending `LV_EVENT_VALUE_CHANGED`. The arrow keys move between the tabs. Change a label with `lvgl_tabs_set_tab_text()`, not on the label widget, so the tabs can size the tab. `lvgl_tabs_set_tab_badge()` shows a small dot at the end of a tab's label, e.g. for unread messages, without changing the size of the tab. `lvgl_tabs_set_tab_hidden()` hides a tab: hiding the selected tab selects the first tab that is shown, without an event.
 
 `lvgl_tabs_set_mode()` chooses how the tabs are sized:
 
 | Mode | Tabs |
 |---|---|
-| `LVGL_TABS_MODE_FIXED` (default) | The tabs have equal widths and fill the bar, which is as wide as its parent. Labels that don't fit end in an ellipsis. |
+| `LVGL_TABS_MODE_FIXED` (default) | The tabs have equal widths and fill the bar, which is as wide as its parent. When a label doesn't fit, the tabs use the small text font. Labels that still don't fit end in an ellipsis. |
 | `LVGL_TABS_MODE_SCROLLABLE` | The tabs are as wide as their label, and the bar scrolls horizontally when they don't fit. For many tabs or long labels. |
-| `LVGL_TABS_MODE_WRAP` | The bar is as wide as its tabs, and the tabs are as wide as their label. When the bar doesn't fit in its parent, the longest labels are shortened and end in an ellipsis. Useful on small displays. |
+| `LVGL_TABS_MODE_WRAP` | The bar is as wide as its tabs, and the tabs are as wide as their label. When the bar doesn't fit in its parent, the tabs use the small text font. When it still doesn't fit, the longest labels are shortened and end in an ellipsis. Useful on small displays. In a flex row, e.g. a header with buttons, the bar takes the room that the other widgets leave. |
 
 ### Chip
 
@@ -204,6 +207,24 @@ lv_obj_add_event_cb(group, on_group_pressed, LV_EVENT_SHORT_CLICKED, ctx);
 ```
 
 It's also useful for content that only scrolls, such as a long text: the keys can scroll it when it's focused.
+
+### Statusline
+
+One line of small text with a dot in front of it. The dot shows the level of the status: OK, warning or error. It's as wide as its parent and text that doesn't fit ends in an ellipsis, so it takes one line on any display.
+
+```c
+lv_obj_t* status = lvgl_statusline_create(parent);
+lvgl_statusline_set_text(status, "No Internet Connection");
+lvgl_statusline_set_level(status, LVGL_STATUSLINE_LEVEL_WARNING);
+```
+
+| Level | Use | Colour theme | Monochrome theme |
+|---|---|---|---|
+| `LVGL_STATUSLINE_LEVEL_OK` (default) | Everything works | Green | Filled circle |
+| `LVGL_STATUSLINE_LEVEL_WARNING` | Something needs attention, e.g. no internet connection | Orange | Outlined circle |
+| `LVGL_STATUSLINE_LEVEL_ERROR` | Something failed, e.g. a download | Error colour | Filled square |
+
+Hide it with `lv_obj_set_hidden()` when there is nothing to report.
 
 ### Spinner
 

@@ -33,6 +33,8 @@ if (!lvgl_indev_exists(LV_INDEV_TYPE_POINTER)) {
 
 The toolbar already focuses its close button on devices without touch. Whichever way the keys enter the toolbar (from below, from above or from the side), they land on the close button.
 
+`lvgl_grid_navigation_focus_without_touch(container, child)` does the same for a widget of your own, and does nothing when there is a touchscreen. See [Custom headers](#custom-headers).
+
 ## Grids and rows
 
 By default, up and down move to the previous and next widget, which is slow in a grid of items. Grid navigation lets the arrow keys move in two directions inside a container:
@@ -51,6 +53,26 @@ lvgl_grid_navigation_add(grid);
 - `lvgl_grid_navigation_get_focused(grid)` returns the focused child.
 
 The app grid in the Launcher, the toolbar and the statusbar use it.
+
+## Custom headers
+
+An app that replaces the toolbar with its own header (a close button, tabs and actions in one row) must keep every part reachable with the arrow keys:
+
+- A plain button ignores left and right. Put the close button in a container of its own and add grid navigation to it, like the tabs and the actions. Grid navigation can't be nested, so each part is a group of its own. Moving past the edge of a group moves the focus to the previous or next group.
+- Select the close button when the app starts on a device without touch, as the toolbar does:
+
+```c
+auto* close = lv_obj_create(header);
+lv_obj_remove_style_all(close);
+lv_obj_set_size(close, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+lv_obj_set_flex_flow(close, LV_FLEX_FLOW_ROW);
+auto* close_button = lvgl_icon_button_create(close);
+lvgl_grid_navigation_add(close);
+lvgl_grid_navigation_focus_without_touch(close, close_button);
+```
+
+- Cards that only show information but don't fit on a small display need to be focusable, so the keys can scroll to them. Make them clickable and click-focusable, in a grid navigation container.
+- With tabs, keep only the containers of the shown tab in the focus group, so hidden content can't take the focus.
 
 ## Text input
 
