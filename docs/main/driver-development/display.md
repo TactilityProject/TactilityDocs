@@ -155,7 +155,7 @@ Examples: `Drivers/gdeq031t10-module` (1 bpp, full frame), `Drivers/esp-epaper-m
 
 ## Display shape (insets)
 
-Displays with rounded corners or a circular visible area report their shape, so that the statusbar, the toolbar and the apps keep their content inside it (see [Insets](../app-development/insets.md) for how apps use it).
+Displays with rounded corners or a circular visible area report their shape, so that the window manager, the toolbar and the apps keep their content inside it. The window manager makes its system bars thick enough to cover rounded corners (see [Insets](../app-development/insets.md) for how apps use it, including apps without LVGL).
 
 To support it in a driver:
 1. Include the shared `display.yaml` binding, which adds the optional `shape` and `corner-radius` properties:

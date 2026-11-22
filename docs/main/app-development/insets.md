@@ -4,17 +4,11 @@ Some devices have a display that isn't a plain rectangle: it has rounded corners
 
 ## What Tactility does for you
 
-Most apps don't need to do anything: the window manager and the standard widgets handle the display's shape.
+The window manager arranges the system bars around the display's shape. On rounded displays the bars are made thick enough to cover the corners, and on circular displays the app area is padded to the square that fits inside the circle. Apps that only use the app area, and the toolbar, don't need to do anything. See [System bars](ui.md#system-bars).
 
-| Display shape | Statusbar | App area | Toolbar (`lvgl_toolbar_create()`) |
-|---|---|---|---|
-| Rectangle | Normal layout | Full screen below the statusbar | Normal layout |
-| Rounded corners | Content moved inward from the corners | Full screen below the statusbar | Content moved inward where it overlaps a corner |
-| Circle | Two centered rows: the time, with the status icons below it | Padded to the square that fits inside the circle | Content moved inward where it overlaps the edge |
+Use the API below when your content isn't in the app area, like full screen apps and apps without LVGL.
 
-On rounded displays, the app area reaches the bottom corners of the screen. Rows that touch the bottom edge should move their content inward themselves (see [Edge padding](#edge-padding)).
-
-## API
+## LVGL API
 
 The functions are in `lvgl-module`'s `<lvgl/insets.h>`. They must be called with the LVGL lock held, e.g. from an app's `create_widgets` callback.
 
@@ -75,3 +69,22 @@ LvglInsets insets;
 lvgl_display_get_insets(lv_obj_get_display(parent), &insets);
 lv_obj_set_style_pad_top(score_label_container, insets.top, LV_STATE_DEFAULT);
 ```
+
+## Apps without LVGL
+
+Apps that draw to the display directly can read the shape from the display device (`<tactility/drivers/display.h>`) and keep their content inside it. This doesn't need the LVGL lock:
+
+```c
+static bool find_display(struct Device* device, void* context) {
+    *(struct Device**)context = device;
+    return false;
+}
+
+struct Device* display = NULL;
+device_for_each_of_type(&DISPLAY_TYPE, &display, find_display);
+
+struct DisplayShape shape;
+display_get_shape(display, &shape);
+```
+
+`shape.shape` and `shape.corner_radius` are the same as in the [LVGL API](#display-shape). The resolution comes from `display_get_resolution_x()` and `display_get_resolution_y()`. For a rounded display, a margin of `ceil(corner_radius * (1 - 1/sqrt(2)))` on the top and the bottom keeps a full-width rectangle inside the curve.

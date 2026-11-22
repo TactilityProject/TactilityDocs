@@ -99,7 +99,7 @@ Keep using a flex layout for a group of items that you add and remove, such as l
 
 ## System bars
 
-The window manager shows the statusbar and a page bar around your window (`<lvgl_window_manager/system_bars.h>`). On wide displays the statusbar is a strip on the left and the page bar is at the bottom of that strip. Otherwise the statusbar is on top and the page bar is below your window. The user can align the system bars to the left (the default) or to the right in the Appearance settings. On the right, the strip is on the right and the page bar's buttons are mirrored. You don't have to handle any of this: the page bar follows the layout and the alignment by itself. `system_bars_get_layout()` and `system_bars_get_alignment()` tell you what is shown, e.g. to place a widget next to the strip.
+The window manager shows the statusbar and a page bar around your window (`<lvgl_window_manager/system_bars.h>`). On wide displays the statusbar is a strip on the left and the page bar is at the bottom of that strip. Otherwise the statusbar is on top and the page bar is below your window. The user can align the system bars to the left (the default) or to the right in the Appearance settings. On the right, the strip is on the right and the page bar's buttons are mirrored. You don't have to handle any of this: the page bar follows the layout and the alignment by itself. `system_bars_get_layout()` and `system_bars_get_alignment()` tell you what is shown, e.g. to place a widget next to the strip. On displays with rounded corners the bars are made thicker, so that the app area stays clear of the corners (see [Insets](insets.md)).
 
 The page bar can show two things for your app, and it only shows up while it has a button to show:
 
