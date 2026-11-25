@@ -128,6 +128,31 @@ The page bar also has a **notifications button** that belongs to the system, not
 
 The callbacks run on the LVGL task, with the LVGL lock held. The window manager resets the page buttons and the main action when your window's widgets are deleted, so set them in `create_widgets` every time. `system_bars_set_statusbar_visible()` hides the statusbar for a full screen app. Show it again when your widgets are destroyed.
 
+## Dialogs
+
+`<lvgl_window_manager/dialog.h>` shows a dialog over your own window, without starting another app. The dialog is a card on a dimmed backdrop. While it is shown it has its own focus group, so the keyboard and encoder can't reach your widgets, and a pointer can't reach them through the backdrop. Your window isn't buried, so your widgets and their pointers stay valid.
+
+```c
+static void on_result(int32_t button_index, void* user_data) {
+    // Runs on the dialog's own task. WINDOW_DIALOG_DISMISSED when no button was pressed.
+    Context* ctx = user_data;
+    ctx->deleteConfirmed = button_index == 0;
+    task_event_group_signal(ctx->event_group, ctx->dialog_bit);
+}
+
+const char* const buttons[] = { "Delete", "Cancel" };
+window_manager_alert_dialog(app_instance_id, "Delete file", "This can't be undone.", buttons, 2, on_result, ctx);
+```
+
+- `window_manager_alert_dialog()` shows a title, a message and buttons. `window_manager_input_dialog()` adds a text field and the buttons OK and Cancel. The result function gets `confirmed` and the text. Enter in the text field acts as OK. `window_manager_selection_dialog()` shows a list of items and gives the index of the selected one. With one item, nothing is shown and the result is that item.
+- The calls don't block, so you can call them from any task and from LVGL callbacks. The texts are copied.
+- Only one dialog is shown at a time, and your app needs a window that is topmost. Otherwise the call fails with `ERROR_RESOURCE_BUSY` or `ERROR_INVALID_STATE`.
+- A dialog closes when a button is pressed, when the backdrop is clicked, when Escape is pressed, or when your window stops being topmost. The last three give `WINDOW_DIALOG_DISMISSED` (-1). `window_manager_dialog_dismiss()` closes it from code.
+- Every dialog runs on a task of its own, and the result function runs on that task after the dialog is gone and the focus is back with your app. The LVGL lock isn't held, so the function can show another dialog or do slow work. It is usually simplest to store the result and signal your own event group, so your event loop continues.
+- When your app removes its window while a dialog is shown, the dialog is closed without calling the result function, so it never sees your freed state.
+
+The built-in dialog apps ([System dialogs](fundamentals.md#system-dialogs)) still work for apps that start them by id. File selection is still an app.
+
 ## Fonts and icons
 
 Tactility has three text sizes and several icon fonts, all scaled from the device's default font size (`<lvgl/fonts.h>`):

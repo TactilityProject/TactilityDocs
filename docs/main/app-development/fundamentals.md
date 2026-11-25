@@ -363,6 +363,8 @@ Call `app_stream_unsubscribe()` exactly once, regardless of the result - on a no
 
 ## System dialogs
 
+For an alert, input or selection dialog, see [Dialogs](ui.md#dialogs): they show over your own window, with a result function, and don't need a child app. The built-in apps below still work, and file selection is only available as an app.
+
 Three built-in apps show a modal dialog. Start them as a modal child by id (see [App results](#app-results)), pass their configuration as text arguments with `app_start_context_set_arguments_ext()`, and handle the `APP_EVENT_RESULT` in your event loop. Call `app_manager_stop()` on the child once its result arrived.
 
 ### Alert dialog (`tactility.alertdialog`)

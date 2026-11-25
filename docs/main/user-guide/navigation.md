@@ -44,7 +44,7 @@ Devices without a touchscreen have a close button in the top row, and the Settin
 ### Settings
 
 - **Toggles** for Wi-Fi, location (GPS), Bluetooth and Mesh. It only shows the ones that your device has (Mesh appears once it's set up, see [Mesh Networking](mesh.md)). **Long press** a toggle to close the menu and open the settings of that feature.
-- **Volume**, when the device has sound output. A speaker button mutes and unmutes (it's filled while the sound is on), and the **-** and **+** buttons change the volume in steps of 10. On a touchscreen with enough room there is a slider between them. Otherwise the volume is shown as a percentage.
+- **Volume** and **brightness**, when the device has sound output and a backlight that can be dimmed. A speaker button mutes and unmutes (it's filled while the sound is on), and the **-** and **+** buttons change a level in steps of 10. When there is room for two rows, both are shown below each other. With less room, only the volume is shown. A slider is shown between the buttons when a touchscreen has room for one, and otherwise the level is shown as a percentage.
 - **Memory**, on devices where it is useful. A ring shows how much internal RAM is free, and a second one shows the free PSRAM when the device has it. The number inside is the free amount, in kB, MB or GB, with at most 3 digits. The ring turns amber when memory is getting low and red when it is critical (below 64 kB and 32 kB of internal RAM, or below 20% and 10% of the PSRAM). On monochrome displays, a critical ring is shown inverted. The rings are in the middle of the top row, between the close and power off buttons, and are left out when there isn't room for them.
 - If the toggles don't fit, they scroll vertically.
 
