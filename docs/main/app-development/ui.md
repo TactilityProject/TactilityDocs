@@ -16,7 +16,7 @@ The window manager keeps a stack of windows, one per app instance. **Only the to
 
 This has a few consequences for `create_widgets(lv_obj_t* parent, void* user_data)`:
 - It can be called many times, so it must rebuild the UI from your app's current state, which you keep in your own context (passed as `user_data`), not in the widgets.
-- It must only rebuild what's already decided. Decisions (e.g. what to do with a dialog's result) belong in your app's `main()` loop, where you handle `APP_EVENT_RESULT`.
+- It must only rebuild what's already decided. Decisions (e.g. what to do with the result of a dialog or a child app) belong in your app's `main()` loop.
 - It can run on another app's task: the one whose window was removed. Don't use thread-local state, and don't call window manager functions from it, as that would deadlock.
 - Anything that refers to the widgets, like an `lv_timer` or stored `lv_obj_t*` pointers, must stop or be cleared when the widgets are deleted. Use an `LV_EVENT_DELETE` callback on one of the widgets, or `window_manager_create_ext()` with a `destroy_widgets` callback.
 
@@ -144,6 +144,7 @@ const char* const buttons[] = { "Delete", "Cancel" };
 window_manager_alert_dialog(app_instance_id, "Delete file", "This can't be undone.", buttons, 2, on_result, ctx);
 ```
 
+- `window_manager_file_dialog()` picks files or folders, see [File dialog](#file-dialog).
 - `window_manager_alert_dialog()` shows a title, a message and buttons. `window_manager_input_dialog()` adds a text field and the buttons OK and Cancel. The result function gets `confirmed` and the text. Enter in the text field acts as OK. `window_manager_selection_dialog()` shows a list of items and gives the index of the selected one. With one item, nothing is shown and the result is that item.
 - The calls don't block, so you can call them from any task and from LVGL callbacks. The texts are copied.
 - Only one dialog is shown at a time, and your app needs a window that is topmost. Otherwise the call fails with `ERROR_RESOURCE_BUSY` or `ERROR_INVALID_STATE`.
@@ -151,7 +152,52 @@ window_manager_alert_dialog(app_instance_id, "Delete file", "This can't be undon
 - Every dialog runs on a task of its own, and the result function runs on that task after the dialog is gone and the focus is back with your app. The LVGL lock isn't held, so the function can show another dialog or do slow work. It is usually simplest to store the result and signal your own event group, so your event loop continues.
 - When your app removes its window while a dialog is shown, the dialog is closed without calling the result function, so it never sees your freed state.
 
-The built-in dialog apps ([System dialogs](fundamentals.md#system-dialogs)) still work for apps that start them by id. File selection is still an app.
+The built-in dialog apps ([System dialogs](fundamentals.md#system-dialogs)) are deprecated. They still work for apps that start them by id.
+
+### File dialog
+
+`window_manager_file_dialog()` lets the user pick files or folders, or name a new file:
+
+```c
+static void on_file_picked(const char* const* paths, uint32_t path_count, void* user_data) {
+    // Runs on the dialog's own task. path_count is 0 when the dialog was dismissed.
+    // The paths are only valid during this call, so copy what you need.
+    struct Context* ctx = user_data;
+    snprintf(ctx->picked_path, sizeof(ctx->picked_path), "%s", path_count > 0 ? paths[0] : "");
+    task_event_group_signal(ctx->event_group, ctx->file_bit);
+}
+
+static const char* const extensions[] = { "txt", "md" };
+const struct WindowFileDialogOptions options = {
+    .flags = WINDOW_FILE_DIALOG_NEW_FILE,
+    .path = directory,
+    .name = "notes.txt",
+    .extensions = extensions,
+    .extension_count = 2,
+};
+window_manager_file_dialog(app_instance_id, &options, on_file_picked, ctx);
+```
+
+Pass `NULL` as the options to pick one existing file, starting at the root of the data. The options and their strings are copied.
+
+| Field | Meaning |
+|---|---|
+| `flags` | A combination of the flags below, or 0 to pick one existing file. |
+| `path` | The folder that is shown first, or `NULL` for the root of the data. |
+| `name` | The text that the name field starts with, or `NULL`. Only used with `WINDOW_FILE_DIALOG_NEW_FILE`. |
+| `extensions`, `extension_count` | Only allow files with these extensions. The leading dot is optional and the match ignores case. 0 allows every file. Folders are always shown, so the user can navigate. A name that the user types needs one of the extensions too. |
+
+| Flag | Effect |
+|---|---|
+| `WINDOW_FILE_DIALOG_NEW_FILE` | Adds a name field, to pick a path that doesn't exist yet (for "save as"). |
+| `WINDOW_FILE_DIALOG_FOLDER` | Allows picking the folder that is shown. With a name field, leave it empty to pick the folder. |
+| `WINDOW_FILE_DIALOG_NO_FILES` | Doesn't allow picking files. With `WINDOW_FILE_DIALOG_FOLDER` this makes a folder picker. |
+| `WINDOW_FILE_DIALOG_MULTIPLE` | Allows picking more than one file. The selection is kept while navigating between folders. |
+
+- The dialog doesn't ask before an existing file is picked with `WINDOW_FILE_DIALOG_NEW_FILE`. Ask the user yourself before you overwrite it.
+- A selection that isn't allowed, e.g. a file that doesn't exist, is shown as an error in the dialog, which stays open.
+- On small displays the dialog fills the area of your app. While it is shown, it uses the page buttons of the [system bars](#system-bars), and hides the main action. Yours are restored when it closes.
+- Your result function runs after the dialog is gone, and another dialog can be shown before your task handled the result. When your app keeps state that belongs to a request, such as whether it is opening or saving, don't start another request until the result was used.
 
 ## Fonts and icons
 

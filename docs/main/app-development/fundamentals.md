@@ -363,9 +363,17 @@ Call `app_stream_unsubscribe()` exactly once, regardless of the result - on a no
 
 ## System dialogs
 
-For an alert, input or selection dialog, see [Dialogs](ui.md#dialogs): they show over your own window, with a result function, and don't need a child app. The built-in apps below still work, and file selection is only available as an app.
+> [!WARNING]
+> The dialog apps are deprecated and will be removed. Each one logs a warning when it starts. Use the window manager's [dialogs](ui.md#dialogs) instead: they show over your own window, with a result function, and don't need a child app.
 
-Three built-in apps show a modal dialog. Start them as a modal child by id (see [App results](#app-results)), pass their configuration as text arguments with `app_start_context_set_arguments_ext()`, and handle the `APP_EVENT_RESULT` in your event loop. Call `app_manager_stop()` on the child once its result arrived.
+| Deprecated app | Replacement |
+|---|---|
+| `tactility.alertdialog` | `window_manager_alert_dialog()` |
+| `tactility.inputdialog` | `window_manager_input_dialog()` |
+| `tactility.selectiondialog` | `window_manager_selection_dialog()` |
+| `tactility.fileselection` | `window_manager_file_dialog()` (see [File dialog](ui.md#file-dialog)) |
+
+The built-in apps show a modal dialog. Start them as a modal child by id (see [App results](#app-results)), pass their configuration as text arguments with `app_start_context_set_arguments_ext()`, and handle the `APP_EVENT_RESULT` in your event loop. Call `app_manager_stop()` on the child once its result arrived.
 
 ### Alert dialog (`tactility.alertdialog`)
 
@@ -416,6 +424,7 @@ It is configured with text arguments:
 | `--multiple` | Allow picking more than one file. Tapping a file toggles it. The selection is kept while navigating between folders. |
 | `--max-bytes=<n>` | The size of your stream buffer. A longer selection is refused and the dialog stays open. Always pass it: without it the length is not checked, and a result that doesn't fit blocks the dialog. |
 | `--new` | Allow a path that doesn't exist yet (for "save as"). |
+| `--name=<file name>` | The text that the name field starts with. Only used with `--new`. |
 
 ```c
 const char* argv[] = { "--multiple", "--ext=txt", "--ext=.md" };
