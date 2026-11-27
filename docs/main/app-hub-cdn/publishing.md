@@ -65,6 +65,8 @@ The secrets of the first version still work: `CDN_TOKEN_NAME` and `CDN_TOKEN_VAL
 
 The files go to `<prefix>/<sdk version>/` in the bucket. The packages, details and icons are uploaded first and the index files last, so a list never points at a file that isn't online yet. The bucket has to serve its files publicly, for example through a CDN or a public bucket URL.
 
+The JSON files are uploaded with `Cache-Control: public, max-age=60`, so a CDN serves new lists within a minute. With the secrets `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_PURGE_CACHE_TOKEN` (an API token with the Zone > Cache Purge permission), the Cloudflare cache of the uploaded files is purged after the upload. Without them, or when the purge fails, the job only prints a warning.
+
 ### Publish to GitHub Pages
 
 Set Settings > Pages > Source of the repository to "GitHub Actions". The site gets the files in `<prefix>/<sdk version>/`, the same layout as the bucket. A deployment replaces the whole site, so it only has the apps of the SDK version of the latest build.
@@ -84,6 +86,7 @@ python apppublisher.py bump major|minor|patch [--apps-dir Apps]
 python apppublisher.py release <folder with .app files>
 python apppublisher.py publish s3 <folder> --sdk <version> [--endpoint-url <url>] [--region <region>]
 python apppublisher.py publish pages <folder> --sdk <version> --out <site folder>
+python apppublisher.py purge-cache <folder> --sdk <version> [--prefix apps] [--base-url https://cdn.tactilityproject.org]
 ```
 
 | Command | |
@@ -94,6 +97,7 @@ python apppublisher.py publish pages <folder> --sdk <version> --out <site folder
 | `release` | Renames the packages to `<id>-<version code>.app` and generates the catalog files next to them. It runs in a git repository, because it stores the commit hash. It writes the SDK version of the apps to `sdk_version.txt` (`--sdk-version-file` changes where). |
 | `publish s3` | Uploads the folder to the bucket. It reads `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` and optionally `S3_ENDPOINT_URL` from the environment. `--bucket`, `--prefix`, `--endpoint-url`, `--region` and `--index-only` are optional. |
 | `publish pages` | Copies the folder to a site folder, ready for GitHub Pages |
+| `purge-cache` | Purges the Cloudflare cache of the published files. It reads `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_PURGE_CACHE_TOKEN`, and never fails. |
 
 To check the result by hand, release and publish to a site folder and serve it:
 
@@ -117,4 +121,4 @@ Any host works that serves the files over HTTPS with a certificate that the devi
 - Keep the packages of old versions online: a device with an older cached list can still install from it.
 - Don't change a published file except for the lists. Raise the version code instead.
 
-The firmware has the catalog URL compiled in, so a device only uses another host after the firmware was changed.
+Users add the host as a repository in Settings → Software → App Hub Repositories. The official catalog's URL is compiled into the firmware.

@@ -1,5 +1,6 @@
 - User Guide
   - [Installing Firmware](user-guide/installing-firmware.md)
+  - [Software Updates](user-guide/software-updates.md)
   - [Navigation](user-guide/navigation.md)
   - [Files](user-guide/files.md)
   - [Configuration](user-guide/configuration.md)
@@ -36,6 +37,7 @@
   - [Logging and Errors](kernel-concepts/logging-and-errors.md)
   - [Filesystems](kernel-concepts/filesystems.md)
   - [Services](kernel-concepts/services.md)
+  - [Firmware](kernel-concepts/firmware.md)
 - Device Development
   - [Guide](device-development/guide.md)
   - [Hardware Considerations](device-development/hardware-considerations.md)

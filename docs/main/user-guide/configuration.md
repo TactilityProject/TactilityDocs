@@ -66,4 +66,10 @@ Properties:
 
 Once an access point has been provisioned (see above) or configured through the Wi-Fi app, its settings persist to `/{user_data}/service/wifi/[ssid].ap.properties`, using the same properties as the provisioning file format.
 
+## Software updates
 
+The settings of the update service are in `/{user_data}/service/tactility.firmwareupdate/settings.properties`. Change them in the Software app (see [Software Updates](software-updates.md)).
+
+Properties:
+- `channel`: the update channel: `stable` (shown as Main), `unstable` (shown as Beta) or `develop`. Without it, the channel of the installed firmware is used.
+- `lastCheck`: when the last check for updates happened, in seconds since 1970. It's only stored when the clock is synced.

@@ -25,6 +25,14 @@ If the resolution is higher (e.g. 480x240 or larger) then performance tends to d
 Avoid software manipulation of pixels. For example: the byte swapping option in the esp_lvgl_port library.
 This will likely degrade performance severely.
 
+Displays without their own frame memory (MIPI-DSI and parallel RGB panels) are refreshed from a frame buffer in PSRAM all the time. Writing to flash (installing an update, saving to NVS) turns the cache off for a moment, which makes such a display flicker. With enough PSRAM, run the firmware from PSRAM, so flash writes don't need to turn the cache off:
+
+```properties
+sdkconfig.CONFIG_SPIRAM_XIP_FROM_PSRAM=y
+```
+
+It uses PSRAM for the size of the firmware (about 5.5 MB).
+
 ## Input
 
 There are various types of input devices: touchscreens, encoders and keyboards.

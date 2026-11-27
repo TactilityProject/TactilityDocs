@@ -10,6 +10,7 @@ A service is a long-running part of the system that works in the background, ind
 | `tactility.rtctime` | Keeps the system time in sync with a real-time clock |
 | `tactility.displayidle`, `tactility.keyboardidle` | Turn off the display and keyboard backlight after a period without activity |
 | `tactility.memorychecker` | Warns in the statusbar when memory gets low |
+| `tactility.firmwareupdate` | Checks the CDN for firmware updates and installs them (see [Software Updates](../user-guide/software-updates.md)) |
 
 The services of the firmware are in `Tactility/Source/service/`.
 

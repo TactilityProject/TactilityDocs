@@ -31,9 +31,22 @@ Make an empty new folder in `Devices/` with a name that matches the device ident
 
 The `sdkconfig` is generated from `device.properties` file in `Devices/your-device-identifier/`
 
-Run `python device.py your-device-identifier` to generate the `sdkconfig` file for the device. You can add `--dev` to generate partitions with a `4 MB` footprint for faster flashing.
+Run `python device.py your-device-identifier` to generate the `sdkconfig` file for the device. You can add `--dev` to use a partition table with a small data partition, for faster flashing (only for devices that keep their data in internal flash).
 
 See the [device.properties documentation](device-properties.md) for more info.
+
+## Partition table
+
+`device.py` picks the partition table from `hardware.flashSize` and `storage.path`: `partitions-<size>mb-with-sd.csv` for devices that keep their data on an SD card, and `partitions-<size>mb-no-sd.csv` for devices that keep it in the internal `data` partition.
+
+| Table | App partitions | Updates over Wi-Fi |
+|---|---|---|
+| 4 MB with SD, 8 MB | One `factory` partition | No |
+| 16 MB with SD | Two OTA partitions of 7.75 MB | Yes |
+| 16 MB without SD | One `factory` partition of 7.75 MB, and a `data` partition | No |
+| 32 MB | Two OTA partitions of 7.75 MB (and a `data` partition without SD) | Yes |
+
+Tables with OTA partitions also turn on app rollback in the bootloader (see [Firmware](../kernel-concepts/firmware.md)). The partition table isn't part of an update over Wi-Fi: devices only get a changed table with the [Web Installer](../user-guide/installing-firmware.md).
 
 ## Implementation
 

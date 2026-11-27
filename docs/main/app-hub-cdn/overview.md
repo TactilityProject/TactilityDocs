@@ -23,3 +23,5 @@ For a project with an `Apps/` folder (one folder per app, each with a `manifest.
 
 The catalog is published in a folder named after the SDK version without its postfix (SDK `0.8.0-dev` uses `0.8.0`), so a new Tactility version can start with a new catalog.
 The official catalog is at `https://cdn.tactilityproject.org/apps/<version>/`.
+
+Users add other catalogs in Settings → Software → App Hub Repositories (see [Software Updates](../user-guide/software-updates.md#app-hub-repositories)). A repository's address is the folder that has a folder per Tactility version, for example `https://example.com/apps`.
